@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 
 const Game2048 = () => {
   const [board, setBoard] = useState([
     [0, 0, 0, 0],
     [0, 0, 0, 0],
     [0, 0, 0, 0],
-    [0, 0, 0, 0]
+    [0, 0, 0, 0],
   ]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [showGameOverPopup, setShowGameOverPopup] = useState(false);
-  
+
+  const [highScore, setHighScore] = useState(
+    () => Number(localStorage.getItem("highScore")) || 0
+  );
 
   // Initialize game
   const initializeGame = useCallback(() => {
@@ -18,13 +21,13 @@ const Game2048 = () => {
       [0, 0, 0, 0],
       [0, 0, 0, 0],
       [0, 0, 0, 0],
-      [0, 0, 0, 0]
+      [0, 0, 0, 0],
     ];
-    
+
     // Add two initial tiles
     addRandomTile(newBoard);
     addRandomTile(newBoard);
-    
+
     setBoard(newBoard);
     setScore(0);
     setGameOver(false);
@@ -41,9 +44,10 @@ const Game2048 = () => {
         }
       }
     }
-    
+
     if (emptyTiles.length > 0) {
-      const randomTile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+      const randomTile =
+        emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
       currentBoard[randomTile.r][randomTile.c] = Math.random() < 0.1 ? 4 : 2;
     }
   };
@@ -61,29 +65,29 @@ const Game2048 = () => {
   // Check if game is over
   const isGameOver = (currentBoard) => {
     if (hasEmptyTile(currentBoard)) return false;
-    
+
     // Check horizontal moves
     for (let r = 0; r < 4; r++) {
       for (let c = 0; c < 3; c++) {
         if (currentBoard[r][c] === currentBoard[r][c + 1]) return false;
       }
     }
-    
+
     // Check vertical moves
     for (let c = 0; c < 4; c++) {
       for (let r = 0; r < 3; r++) {
         if (currentBoard[r][c] === currentBoard[r + 1][c]) return false;
       }
     }
-    
+
     return true;
   };
 
   // Slide and merge row
   const slideAndMergeRow = (row) => {
-    let newRow = row.filter(num => num !== 0);
+    let newRow = row.filter((num) => num !== 0);
     let scoreIncrease = 0;
-    
+
     for (let i = 0; i < newRow.length - 1; i++) {
       if (newRow[i] === newRow[i + 1]) {
         newRow[i] *= 2;
@@ -91,12 +95,12 @@ const Game2048 = () => {
         scoreIncrease += newRow[i];
       }
     }
-    
-    newRow = newRow.filter(num => num !== 0);
+
+    newRow = newRow.filter((num) => num !== 0);
     while (newRow.length < 4) {
       newRow.push(0);
     }
-    
+
     return { row: newRow, scoreIncrease };
   };
 
@@ -105,23 +109,29 @@ const Game2048 = () => {
     const newBoard = [...board];
     let totalScoreIncrease = 0;
     let moved = false;
-    
+
     for (let r = 0; r < 4; r++) {
       const originalRow = [...newBoard[r]];
       const { row, scoreIncrease } = slideAndMergeRow(newBoard[r]);
       newBoard[r] = row;
       totalScoreIncrease += scoreIncrease;
-      
+
       if (JSON.stringify(originalRow) !== JSON.stringify(row)) {
         moved = true;
       }
     }
-    
+
     if (moved) {
       addRandomTile(newBoard);
       setBoard(newBoard);
-      setScore(prevScore => prevScore + totalScoreIncrease);
-      
+      setScore((prevScore) => prevScore + totalScoreIncrease);
+      const newScore = score + totalScoreIncrease;
+      setScore(newScore);
+      if (newScore > highScore) {
+        setHighScore(newScore);
+        localStorage.setItem("highScore", newScore);
+      }
+
       if (isGameOver(newBoard)) {
         setGameOver(true);
         setShowGameOverPopup(true);
@@ -134,24 +144,30 @@ const Game2048 = () => {
     const newBoard = [...board];
     let totalScoreIncrease = 0;
     let moved = false;
-    
+
     for (let r = 0; r < 4; r++) {
       const originalRow = [...newBoard[r]];
       const reversedRow = [...newBoard[r]].reverse();
       const { row, scoreIncrease } = slideAndMergeRow(reversedRow);
       newBoard[r] = row.reverse();
       totalScoreIncrease += scoreIncrease;
-      
+
       if (JSON.stringify(originalRow) !== JSON.stringify(newBoard[r])) {
         moved = true;
       }
     }
-    
+
     if (moved) {
       addRandomTile(newBoard);
       setBoard(newBoard);
-      setScore(prevScore => prevScore + totalScoreIncrease);
-      
+      setScore((prevScore) => prevScore + totalScoreIncrease);
+      const newScore = score + totalScoreIncrease;
+      setScore(newScore);
+      if (newScore > highScore) {
+        setHighScore(newScore);
+        localStorage.setItem("highScore", newScore);
+      }
+
       if (isGameOver(newBoard)) {
         setGameOver(true);
         setShowGameOverPopup(true);
@@ -164,28 +180,39 @@ const Game2048 = () => {
     const newBoard = [...board];
     let totalScoreIncrease = 0;
     let moved = false;
-    
+
     for (let c = 0; c < 4; c++) {
-      const column = [newBoard[0][c], newBoard[1][c], newBoard[2][c], newBoard[3][c]];
+      const column = [
+        newBoard[0][c],
+        newBoard[1][c],
+        newBoard[2][c],
+        newBoard[3][c],
+      ];
       const originalColumn = [...column];
       const { row, scoreIncrease } = slideAndMergeRow(column);
-      
+
       for (let r = 0; r < 4; r++) {
         newBoard[r][c] = row[r];
       }
-      
+
       totalScoreIncrease += scoreIncrease;
-      
+
       if (JSON.stringify(originalColumn) !== JSON.stringify(row)) {
         moved = true;
       }
     }
-    
+
     if (moved) {
       addRandomTile(newBoard);
       setBoard(newBoard);
-      setScore(prevScore => prevScore + totalScoreIncrease);
-      
+      setScore((prevScore) => prevScore + totalScoreIncrease);
+      const newScore = score + totalScoreIncrease;
+      setScore(newScore);
+      if (newScore > highScore) {
+        setHighScore(newScore);
+        localStorage.setItem("highScore", newScore);
+      }
+
       if (isGameOver(newBoard)) {
         setGameOver(true);
         setShowGameOverPopup(true);
@@ -198,30 +225,41 @@ const Game2048 = () => {
     const newBoard = [...board];
     let totalScoreIncrease = 0;
     let moved = false;
-    
+
     for (let c = 0; c < 4; c++) {
-      const column = [newBoard[0][c], newBoard[1][c], newBoard[2][c], newBoard[3][c]];
+      const column = [
+        newBoard[0][c],
+        newBoard[1][c],
+        newBoard[2][c],
+        newBoard[3][c],
+      ];
       const originalColumn = [...column];
       const reversedColumn = [...column].reverse();
       const { row, scoreIncrease } = slideAndMergeRow(reversedColumn);
       const newColumn = row.reverse();
-      
+
       for (let r = 0; r < 4; r++) {
         newBoard[r][c] = newColumn[r];
       }
-      
+
       totalScoreIncrease += scoreIncrease;
-      
+
       if (JSON.stringify(originalColumn) !== JSON.stringify(newColumn)) {
         moved = true;
       }
     }
-    
+
     if (moved) {
       addRandomTile(newBoard);
       setBoard(newBoard);
-      setScore(prevScore => prevScore + totalScoreIncrease);
-      
+      setScore((prevScore) => prevScore + totalScoreIncrease);
+      const newScore = score + totalScoreIncrease;
+      setScore(newScore);
+      if (newScore > highScore) {
+        setHighScore(newScore);
+        localStorage.setItem("highScore", newScore);
+      }
+
       if (isGameOver(newBoard)) {
         setGameOver(true);
         setShowGameOverPopup(true);
@@ -234,21 +272,21 @@ const Game2048 = () => {
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (gameOver) return;
-      
+
       switch (e.code) {
-        case 'ArrowLeft':
+        case "ArrowLeft":
           e.preventDefault();
           moveLeft();
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           e.preventDefault();
           moveRight();
           break;
-        case 'ArrowUp':
+        case "ArrowUp":
           e.preventDefault();
           moveUp();
           break;
-        case 'ArrowDown':
+        case "ArrowDown":
           e.preventDefault();
           moveDown();
           break;
@@ -257,8 +295,8 @@ const Game2048 = () => {
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [board, gameOver]);
 
   // Handle touch events
@@ -268,19 +306,19 @@ const Game2048 = () => {
     const touch = e.touches[0];
     setTouchStart({
       x: touch.clientX,
-      y: touch.clientY
+      y: touch.clientY,
     });
   };
 
   const handleTouchEnd = (e) => {
     if (!touchStart.x || !touchStart.y || gameOver) return;
-    
+
     const touch = e.changedTouches[0];
     const dx = touch.clientX - touchStart.x;
     const dy = touch.clientY - touchStart.y;
-    
+
     const threshold = 50;
-    
+
     if (Math.abs(dx) > Math.abs(dy)) {
       if (Math.abs(dx) > threshold) {
         if (dx > 0) {
@@ -298,7 +336,7 @@ const Game2048 = () => {
         }
       }
     }
-    
+
     setTouchStart({ x: null, y: null });
   };
 
@@ -308,8 +346,9 @@ const Game2048 = () => {
   }, [initializeGame]);
 
   const getTileStyle = (value) => {
-    const baseStyle = "w-20 h-20 flex items-center justify-center text-4xl font-bold border-4";
-    
+    const baseStyle =
+      "w-20 h-20 flex items-center justify-center text-4xl font-bold border-4";
+
     // Exact colors from original CSS
     switch (value) {
       case 0:
@@ -346,32 +385,30 @@ const Game2048 = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-slate-800  to-slate-600" style={{
-      background: 'linear-gradient(to bottom, #000000 20%, #0f2027 40%, #203a43 70%, #2c5364 100%)',
-      backgroundAttachment: 'fixed'
-    }}>
-
-      {/* Game Container - Centered like original */}
-      <div className="flex flex-col items-center text-white font-sans">
-        
-        {/* Game Board - Exact dimensions and styling */}
-        <div 
-          className="w-96 h-96 p-2 grid grid-cols-4 mt-8"
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white flex justify-center items-center px-4">
+      <div className="flex flex-col items-center font-sans w-full max-w-xl space-y-6 py-8">
+        {/* Game Board */}
+        <div
+          className="p-1 sm:p-4 grid grid-cols-4 gap-2 mx-auto sm:gap-4 rounded-xl shadow-2xl"
           style={{
-            backgroundColor: '#cdc1b5',
-            border: '6px solid #bbada0',
-            width: '400px',
-            height: '400px'
+            background: "linear-gradient(180deg, #2d2d2d 0%, #1f1f1f 100%)",
+            border: "3px solid #4b5563",
+            width: "100%",
+            maxWidth: "420px",
+            aspectRatio: "1 / 1",
           }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
           {board.map((row, rowIndex) =>
             row.map((value, colIndex) => (
-              <div 
-                key={`${rowIndex}-${colIndex}`} 
+              <div
+                key={`${rowIndex}-${colIndex}`}
                 className={getTileStyle(value)}
-                style={{ border: '5px solid #bbada0' }}
+                style={{
+                  border: "2px solid #4b5563",
+                  borderRadius: "0.5rem",
+                }}
               >
                 {value !== 0 && value}
               </div>
@@ -379,44 +416,199 @@ const Game2048 = () => {
           )}
         </div>
 
-        {/* Score - Positioned like original */}
-        <div className="mt-8 text-xl font-bold">
-          Score: {score}
+        {/* Scores */}
+        <div className="flex justify-center gap-10">
+          <div className="bg-slate-800 rounded-lg px-4 py-2 shadow-inner text-center">
+            <div className="text-sm text-amber-400 font-semibold">Score</div>
+            <div className="text-2xl font-bold text-white">{score}</div>
+          </div>
+          <div className="bg-slate-800 rounded-lg px-4 py-2 shadow-inner text-center">
+            <div className="text-sm text-emerald-400 font-semibold">
+              High Score
+            </div>
+            <div className="text-2xl font-bold text-white">{highScore}</div>
+          </div>
         </div>
 
-        {/* Reset Button - Positioned like original */}
+        {/* Control Buttons */}
+        <div className="grid grid-cols-3 gap-3 text-lg font-bold text-white">
+          <div></div>
+          <button
+            onClick={moveUp}
+            className="bg-gray-700 hover:bg-amber-500 px-4 py-2 rounded-md shadow"
+          >
+            ↑
+          </button>
+          <div></div>
+          <button
+            onClick={moveLeft}
+            className="bg-gray-700 hover:bg-amber-500 px-4 py-2 rounded-md shadow"
+          >
+            ←
+          </button>
+          <button
+            onClick={moveDown}
+            className="bg-gray-700 hover:bg-amber-500 px-4 py-2 rounded-md shadow"
+          >
+            ↓
+          </button>
+          <button
+            onClick={moveRight}
+            className="bg-gray-700 hover:bg-amber-500 px-4 py-2 rounded-md shadow"
+          >
+            →
+          </button>
+        </div>
+
+        {/* Reset Button */}
         <button
           onClick={initializeGame}
-          className="mt-2 bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-6 rounded transition-colors shadow-lg"
+          className="mt-2 bg-amber-600 hover:bg-yellow-400 hover:text-black text-white font-bold py-2 px-8 rounded-lg shadow-lg transition-all duration-300"
         >
-          Reset
+          🔁 Reset Game
         </button>
 
-        {/* Game Over Message */}
-        <div className="mt-2 h-8 text-red-400 font-bold">
-          {gameOver && !showGameOverPopup && "Game Over! No more moves available."}
-        </div>
+        {/* Game Over Text */}
+        {gameOver && !showGameOverPopup && (
+          <div className="text-red-400 font-medium">
+            Game Over! No more moves.
+          </div>
+        )}
 
-        {/* Game Over Popup - Exact same styling */}
+        {/* Game Over Popup */}
         {showGameOverPopup && (
-          <div 
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-5 rounded-lg z-50 text-2xl text-center"
+          <div
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white px-8 py-6 rounded-xl z-50 text-2xl font-bold text-center shadow-2xl"
             style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.8)'
+              backgroundColor: "rgba(179, 71, 0, 0.95)",
             }}
           >
-            Game Over! No more moves available.
+            Game Over! No more moves.
           </div>
         )}
 
         {/* Instructions */}
-        <div className="mt-8 text-center text-gray-300 max-w-md px-4">
-          <p className="mb-2">Use arrow keys to move tiles. When two tiles with the same number touch, they merge into one!</p>
-          <p className="text-sm">On mobile: swipe to move tiles.</p>
+        <div className="mt-2 text-center text-amber-300 text-sm px-2 leading-snug">
+          <p>Use arrow keys, buttons, or swipe to move tiles.</p>
+          <p>When two tiles with the same number touch, they merge!</p>
         </div>
       </div>
     </div>
   );
+
+  {
+  }
 };
 
 export default Game2048;
+
+// return (
+//   <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white flex justify-center items-center px-4">
+//     <div className="relative flex flex-col items-center font-sans w-full max-w-2xl space-y-6 py-8">
+
+//       {/* Grid container (relative) */}
+//       <div
+//         className="p-4 grid grid-cols-4 gap-4 rounded-xl shadow-2xl"
+//         style={{
+//           background: "linear-gradient(180deg, #2d2d2d 0%, #1f1f1f 100%)",
+//           border: "3px solid #4b5563",
+//           width: "100%",
+//           maxWidth: "420px",
+//           aspectRatio: "1 / 1",
+//         }}
+//         onTouchStart={handleTouchStart}
+//         onTouchEnd={handleTouchEnd}
+//       >
+//         {board.map((row, rowIndex) =>
+//           row.map((value, colIndex) => (
+//             <div
+//               key={`${rowIndex}-${colIndex}`}
+//               className={getTileStyle(value)}
+//               style={{
+//                 border: "2px solid #4b5563",
+//                 borderRadius: "0.5rem",
+//               }}
+//             >
+//               {value !== 0 && value}
+//             </div>
+//           ))
+//         )}
+//       </div>
+
+//       {/* Controls container - absolutely positioned to right of the grid */}
+//       <div
+//         className="absolute top-1/2 left-full ml-6 -translate-y-1/2 flex flex-col items-center space-y-8 w-40"
+//         style={{ pointerEvents: "auto" }}
+//       >
+//         {/* Scores */}
+//         <div className="flex flex-col gap-4 w-full">
+//           <div className="bg-slate-800 rounded-lg px-4 py-2 shadow-inner text-center">
+//             <div className="text-sm text-amber-400 font-semibold">Score</div>
+//             <div className="text-2xl font-bold text-white">{score}</div>
+//           </div>
+//           <div className="bg-slate-800 rounded-lg px-4 py-2 shadow-inner text-center">
+//             <div className="text-sm text-emerald-400 font-semibold">High Score</div>
+//             <div className="text-2xl font-bold text-white">{highScore}</div>
+//           </div>
+//         </div>
+
+//         {/* Arrow buttons vertically stacked */}
+//         <div className="flex flex-col items-center gap-3 text-lg font-bold text-white">
+//           <button
+//             onClick={moveUp}
+//             className="bg-gray-700 hover:bg-amber-500 px-6 py-2 rounded-md shadow"
+//           >
+//             ↑
+//           </button>
+//           <div className="flex gap-3">
+//             <button
+//               onClick={moveLeft}
+//               className="bg-gray-700 hover:bg-amber-500 px-6 py-2 rounded-md shadow"
+//             >
+//               ←
+//             </button>
+//             <button
+//               onClick={moveDown}
+//               className="bg-gray-700 hover:bg-amber-500 px-6 py-2 rounded-md shadow"
+//             >
+//               ↓
+//             </button>
+//             <button
+//               onClick={moveRight}
+//               className="bg-gray-700 hover:bg-amber-500 px-6 py-2 rounded-md shadow"
+//             >
+//               →
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* Reset Button */}
+//         <button
+//           onClick={initializeGame}
+//           className="bg-amber-600 hover:bg-yellow-400 hover:text-black text-white font-bold py-2 px-8 rounded-lg shadow-lg transition-all duration-300"
+//         >
+//           🔁 Reset Game
+//         </button>
+//       </div>
+
+//       {/* The rest of your components below (game over text, popup, instructions) */}
+//       {gameOver && !showGameOverPopup && (
+//         <div className="text-red-400 font-medium mt-4">Game Over! No more moves.</div>
+//       )}
+
+//       {showGameOverPopup && (
+//         <div
+//           className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white px-8 py-6 rounded-xl z-50 text-2xl font-bold text-center shadow-2xl"
+//           style={{ backgroundColor: "rgba(179, 71, 0, 0.95)" }}
+//         >
+//           Game Over! No more moves.
+//         </div>
+//       )}
+
+//       <div className="mt-2 text-center text-amber-300 text-sm px-2 leading-snug">
+//         <p>Use arrow keys, buttons, or swipe to move tiles.</p>
+//         <p>When two tiles with the same number touch, they merge!</p>
+//       </div>
+//     </div>
+//   </div>
+// );
