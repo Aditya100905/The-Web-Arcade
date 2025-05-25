@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
 import {
   Play,
   Grid3X3,
@@ -17,119 +15,167 @@ import {
   Trophy,
   Clock,
   Users,
+  Square,
+  Gamepad2,
+  Puzzle,
+  Grid,
+  MessageSquare,
+  Layers,
+  Crosshair,
+  Box,
+  Move3D,
+  RotateCcw,
+  MousePointer,
+  Grid2X2,
+  ArrowUp,
+  Shuffle,
+  BrickWall,
+  DotSquareIcon,
 } from "lucide-react";
 
+const games = [
+  {
+    id: 1,
+    name: "2048",
+    category: "Puzzle",
+    difficulty: "Medium",
+    color: "from-orange-500 via-amber-500 to-yellow-500",
+    icon: <Grid2X2 className="w-20 h-20" />, // Better represents the grid-based tile sliding game
+    description: "Combine tiles to reach 2048",
+    route: "/game2048",
+    players: "Single",
+    estimatedTime: "10-20 min",
+    gif: "/gif/2048.gif",
+  },
+  {
+    id: 2,
+    name: "Rock Paper Scissors",
+    category: "Classic",
+    difficulty: "Easy",
+    color: "from-blue-500 via-indigo-500 to-purple-600",
+    icon: <Scissors className="w-20 h-20" />, // Perfect - represents one of the three choices
+    description: "Classic hand game challenge",
+    route: "/rock-paper-scissor",
+    players: "Single",
+    estimatedTime: "2-5 min",
+    gif: "/gif/rock-paper-scissors.gif",
+  },
+  {
+    id: 3,
+    name: "Sudoku",
+    category: "Logic",
+    difficulty: "Hard",
+    color: "from-emerald-500 via-teal-500 to-cyan-600",
+    icon: <Grid3X3 className="w-20 h-20" />, // Perfect - represents the 9x9 grid structure
+    description: "Number puzzle mastery",
+    route: "/sudoku",
+    players: "Single",
+    estimatedTime: "15-30 min",
+    gif: "/gif/sudoku.gif",
+  },
+  {
+    id: 4,
+    name: "Memory Matching",
+    category: "Memory",
+    difficulty: "Easy",
+    color: "from-pink-500 via-rose-500 to-red-500",
+    icon: <Brain className="w-20 h-20" />, // Perfect - represents memory and cognitive skills
+    description: "Test your memory skills",
+    route: "/memory-matching",
+    players: "Single",
+    estimatedTime: "5-10 min",
+    gif: "/gif/memory-matching.gif",
+  },
+  {
+    id: 5,
+    name: "Tic Tac Toe",
+    category: "Strategy",
+    difficulty: "Easy",
+    color: "from-purple-500 via-violet-500 to-indigo-600",
+    icon: <Hash className="w-20 h-20" />, // Perfect - represents the # grid pattern
+    description: "Classic X and O game",
+    route: "/tic-tac-toe",
+    players: "Two",
+    estimatedTime: "2-5 min",
+    gif: "/gif/tic-tac-toe.gif",
+  },
+  {
+    id: 6,
+    name: "Flappy Bird",
+    category: "Arcade",
+    difficulty: "Hard",
+    color: "from-green-500 via-emerald-500 to-teal-600",
+    icon: <Bird className="w-20 h-20" />, // Perfect - literally represents the bird character
+    description: "Navigate through pipes",
+    route: "/flappy-bird",
+    players: "Single",
+    estimatedTime: "5-10 min",
+    gif: "/gif/flappy-bird.gif",
+  },
+  {
+    id: 7,
+    name: "Brick Breaker",
+    category: "Arcade",
+    difficulty: "Medium",
+    color: "from-red-500 via-orange-500 to-yellow-500",
+    icon: <BrickWall className="w-20 h-20" />, // Better represents the bricks/blocks to break
+    description: "Break all the bricks",
+    route: "/brick-breaker",
+    players: "Single",
+    estimatedTime: "10-20 min",
+    gif: "/gif/brick-breaker.gif",
+  },
+  {
+    id: 8,
+    name: "Dots & Boxes",
+    category: "Strategy",
+    difficulty: "Medium",
+    color: "from-cyan-500 via-blue-500 to-indigo-600",
+    icon: <DotSquareIcon className="w-20 h-20" />, // Represents clicking/connecting dots
+    description: "Connect dots to win",
+    route: "/dots-boxes",
+    players: "Two",
+    estimatedTime: "10-15 min",
+    gif: "/gif/dots-and-boxes.gif",
+  },
+];
+
 export default function Home() {
-  const navigate = useNavigate();
   const [hoveredGame, setHoveredGame] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loadedGifs, setLoadedGifs] = useState({});
   const titleRef = useRef(null);
   const typewriterRef = useRef(null);
 
-  const games = [
-    {
-      id: 1,
-      name: "2048",
-      category: "Puzzle",
-      difficulty: "Medium",
-      color: "from-orange-500 via-amber-500 to-yellow-500",
-      icon: <Calculator className="w-6 h-6" />,
-      description: "Combine tiles to reach 2048",
-      route: "/game2048",
-      players: "Single",
-      estimatedTime: "10-20 min",
-    },
-    {
-      id: 2,
-      name: "Rock Paper Scissors",
-      category: "Classic",
-      difficulty: "Easy",
-      color: "from-blue-500 via-indigo-500 to-purple-600",
-      icon: <Scissors className="w-6 h-6" />,
-      description: "Classic hand game challenge",
-      route: "/rock-paper-scissor",
-      players: "Single",
-      estimatedTime: "2-5 min",
-    },
-    {
-      id: 3,
-      name: "Sudoku",
-      category: "Logic",
-      difficulty: "Hard",
-      color: "from-emerald-500 via-teal-500 to-cyan-600",
-      icon: <Grid3X3 className="w-6 h-6" />,
-      description: "Number puzzle mastery",
-      route: "/sudoku",
-      players: "Single",
-      estimatedTime: "15-30 min",
-    },
-    {
-      id: 4,
-      name: "Memory Matching",
-      category: "Memory",
-      difficulty: "Easy",
-      color: "from-pink-500 via-rose-500 to-red-500",
-      icon: <Brain className="w-6 h-6" />,
-      description: "Test your memory skills",
-      route: "/memory-matching",
-      players: "Single",
-      estimatedTime: "5-10 min",
-    },
-    {
-      id: 5,
-      name: "Tic Tac Toe",
-      category: "Strategy",
-      difficulty: "Easy",
-      color: "from-purple-500 via-violet-500 to-indigo-600",
-      icon: <Hash className="w-6 h-6" />,
-      description: "Classic X and O game",
-      route: "/tic-tac-toe",
-      players: "Two",
-      estimatedTime: "2-5 min",
-    },
-    {
-      id: 6,
-      name: "Flappy Bird",
-      category: "Arcade",
-      difficulty: "Hard",
-      color: "from-green-500 via-emerald-500 to-teal-600",
-      icon: <Bird className="w-6 h-6" />,
-      description: "Navigate through pipes",
-      route: "/flappy-bird",
-      players: "Single",
-      estimatedTime: "5-10 min",
-    },
-    {
-      id: 7,
-      name: "Brick Breaker",
-      category: "Arcade",
-      difficulty: "Medium",
-      color: "from-red-500 via-orange-500 to-yellow-500",
-      icon: <Zap className="w-6 h-6" />,
-      description: "Break all the bricks",
-      route: "/brick-breaker",
-      players: "Single",
-      estimatedTime: "10-20 min",
-    },
-    {
-      id: 8,
-      name: "Dots & Boxes",
-      category: "Strategy",
-      difficulty: "Medium",
-      color: "from-cyan-500 via-blue-500 to-indigo-600",
-      icon: <Grid3X3 className="w-6 h-6" />,
-      description: "Connect dots to win",
-      route: "/dots-boxes",
-      players: "Two",
-      estimatedTime: "10-15 min",
-    },
+
+  const categories = [
+    "All",
+    "Puzzle",
+    "Classic",
+    "Logic",
+    "Memory",
+    "Strategy",
+    "Arcade",
   ];
 
-  const categories = ["All", "Puzzle", "Classic", "Logic", "Memory", "Strategy", "Arcade"];
+  const filteredGames =
+    selectedCategory === "All"
+      ? games
+      : games.filter((game) => game.category === selectedCategory);
 
-  const filteredGames = selectedCategory === "All" 
-    ? games 
-    : games.filter(game => game.category === selectedCategory);
+  // Preload GIFs when component mounts
+  useEffect(() => {
+    games.forEach((game) => {
+      const img = new Image();
+      img.onload = () => {
+        setLoadedGifs((prev) => ({ ...prev, [game.id]: true }));
+      };
+      img.onerror = () => {
+        setLoadedGifs((prev) => ({ ...prev, [game.id]: false }));
+      };
+      img.src = game.gif;
+    });
+  }, []);
 
   useEffect(() => {
     class TxtType {
@@ -199,7 +245,7 @@ export default function Home() {
   };
 
   const handleGameClick = (route) => {
-    window.open(route, '_blank');
+    window.open(route, "_blank");
   };
 
   return (
@@ -220,9 +266,9 @@ export default function Home() {
             ref={titleRef}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-6 min-h-[60px] sm:min-h-[80px] flex items-center justify-center"
           ></div>
-<p className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-  Experience classic games reimagined for the modern web.
-</p>
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+            Experience classic games reimagined for the modern web.
+          </p>
 
           <div className="flex flex-wrap justify-center gap-4 text-sm">
             <div className="flex items-center gap-2 bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-500/30">
@@ -267,13 +313,16 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              {selectedCategory === "All" ? "All Games" : `${selectedCategory} Games`}
+              {selectedCategory === "All"
+                ? "All Games"
+                : `${selectedCategory} Games`}
             </h2>
             <p className="text-gray-400 text-sm">
-              Showing {filteredGames.length} game{filteredGames.length !== 1 ? 's' : ''}
+              Showing {filteredGames.length} game
+              {filteredGames.length !== 1 ? "s" : ""}
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {filteredGames.map((game) => (
               <div
@@ -286,40 +335,75 @@ export default function Home() {
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                 ></div>
-                
-                {/* Game Icon Section */}
+
+                {/* Game Icon/GIF Section */}
                 <div className="relative h-36 sm:h-40 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden">
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-20`}
+                    className={`absolute inset-0 bg-gradient-to-br ${
+                      game.color
+                    } opacity-20 transition-opacity duration-500 ${
+                      hoveredGame === game.id ? "opacity-30" : "opacity-20"
+                    }`}
                   ></div>
-                  <div className="relative z-10 w-full h-full flex items-center justify-center">
-                    <div
-                      className={`w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${game.color} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                    >
+
+                  {/* Game Icon or GIF */}
+                  {hoveredGame === game.id ? (
+                    <img
+                      src={game.gif}
+                      alt={`${game.name} preview`}
+                      className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-500"
+                    />
+                  ) : (
+                    <div className="relative z-10 transition-all duration-500 transform scale-100 opacity-100">
                       {game.icon}
                     </div>
-                  </div>
-                  
-                  {/* Hover Overlay */}
-                  {hoveredGame === game.id && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
-                      <div className="text-center px-4">
+                  )}
+
+                  {/* GIF Hover State */}
+                  <div
+                    className={`absolute inset-0 z-20 transition-all duration-500 transform ${
+                      hoveredGame === game.id
+                        ? "scale-100 opacity-100"
+                        : "scale-95 opacity-0 pointer-events-none"
+                    }`}
+                  >
+                    <div className="relative w-full h-full flex items-center justify-center bg-black/30 backdrop-blur-sm">
+                      {loadedGifs[game.id] ? (
+                        <img
+                          src={game.gif}
+                          alt={`${game.name} gameplay preview`}
+                          className="w-full h-full object-cover rounded-lg"
+                          style={{
+                            objectFit: "cover",
+                            width: "100%",
+                            height: "100%",
+                          }}
+                        />
+                      ) : (
                         <div
-                          className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 bg-gradient-to-br ${game.color} rounded-full flex items-center justify-center animate-bounce shadow-lg`}
+                          className={`w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${game.color} rounded-2xl flex items-center justify-center shadow-lg animate-pulse`}
                         >
-                          <Play className="w-4 h-4 sm:w-6 sm:h-6" />
+                          {game.icon}
                         </div>
-                        <p className="text-white font-semibold text-sm sm:text-base">
-                          Click to Play!
-                        </p>
-                        <p className="text-gray-300 text-xs sm:text-sm mt-1">
-                          {game.description}
-                        </p>
+                      )}
+
+                      {/* Play overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center pb-4">
+                        <div className="text-center transform transition-all duration-300 hover:scale-110">
+                          <div
+                            className={`w-12 h-12 mx-auto mb-2 bg-gradient-to-br ${game.color} rounded-full flex items-center justify-center shadow-2xl animate-pulse border-2 border-white/30`}
+                          >
+                            <Play className="w-5 h-5 ml-1" />
+                          </div>
+                          <p className="text-white font-bold text-sm drop-shadow-lg">
+                            Click to Play!
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-                
+
                 {/* Game Info Section */}
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
@@ -327,7 +411,7 @@ export default function Home() {
                       {game.name}
                     </h3>
                   </div>
-                  
+
                   {/* Tags */}
                   <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-3 text-xs">
                     <span className="bg-white/10 backdrop-blur-sm px-2 py-1 rounded-full text-gray-300 border border-white/10">
@@ -341,11 +425,11 @@ export default function Home() {
                       {game.difficulty}
                     </span>
                   </div>
-                  
+
                   <p className="text-gray-400 text-xs sm:text-sm mb-3 line-clamp-2">
                     {game.description}
                   </p>
-                  
+
                   {/* Game Details */}
                   <div className="flex items-center gap-3 mb-3 text-xs text-gray-400">
                     <div className="flex items-center gap-1">
@@ -357,7 +441,7 @@ export default function Home() {
                       <span>{game.estimatedTime}</span>
                     </div>
                   </div>
-                  
+
                   {/* Play Button */}
                   <button
                     className={`w-full bg-gradient-to-r ${game.color} hover:shadow-lg hover:shadow-purple-500/25 text-white py-2 px-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 text-xs sm:text-sm shadow-lg`}
@@ -381,20 +465,15 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center hover:scale-110 transition-transform justify-center gap-3 mb-4">
-
-
-
-            <img
-              src="/logo.png"
-              alt="The Web Arcade Logo"
-              className="w-14 h-14 rounded-full border-2 border-white shadow-lg object-cover"
-            />
-            The Web Arcade
-
-
+              <div className="w-14 h-14 rounded-full border-2 border-white shadow-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Gamepad2 className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-xl font-bold">The Web Arcade</span>
             </div>
             <p className="text-gray-400 text-sm">
-              Built with <span className="animate-pulse text-xl scale-110">❤️</span> for gaming enthusiasts
+              Built with{" "}
+              <span className="animate-pulse text-xl scale-110">❤️</span> for
+              gaming enthusiasts
             </p>
           </div>
         </div>
@@ -402,10 +481,18 @@ export default function Home() {
 
       <style jsx>{`
         @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
         }
         .animate-blob {
           animation: blob 7s infinite;
