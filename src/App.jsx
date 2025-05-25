@@ -10,11 +10,8 @@ import RockPaperScissors from "./games/RockPaperScissors";
 import Sudoku from "./games/Sudoku";
 import MemoryMatching from "./games/MemoryMatching";
 import TicTacToe from "./games/TicTacToe";
-import MazeGame from "./games/MazeGame";
 import BrickBreaker from "./games/BrickBreaker";
 import DotsAndBoxes from "./games/DotsAndBoxesGame";
-import SnakeLadder from "./games/SnakeLadder";
-import MineSwipper from "./games/MineSwipper";
 import FlappyBrid from "./games/FlappyBird";
 
 const App = () => {
@@ -29,12 +26,9 @@ const App = () => {
         <Route path="/sudoku" element={<Sudoku />} />
         <Route path="/memory-matching" element={<MemoryMatching />} />
         <Route path="/tic-tac-toe" element={<TicTacToe />} />
-        <Route path="/maze-game" element={<MazeGame />} />
         <Route path="/brick-breaker" element={<BrickBreaker />} />
         <Route path="/dots-boxes" element={<DotsAndBoxes />} />
         <Route path="/flappy-bird" element={<FlappyBrid />} />
-        <Route path="/minesweeper" element={<MineSwipper />} />
-        <Route path="/snake-ladder" element={<SnakeLadder />} />
       </Routes>
     </>
   );

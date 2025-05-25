@@ -987,7 +987,7 @@ useEffect(() => {
       <div className="text-center bg-gradient-to-br from-indigo-900/90 via-purple-900/90 to-violet-900/90 p-6 md:p-8 rounded-2xl border border-purple-400/30 shadow-2xl backdrop-blur-sm w-full max-w-md">
         <div className="mb-6 md:mb-8">
           <h1 className="text-3xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-            🐦 Flappy Bird
+          Flappy Bird
           </h1>
         </div>
         <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">

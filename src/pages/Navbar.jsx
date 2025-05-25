@@ -8,12 +8,9 @@ const games = [
   { name: "Sudoku", path: "/sudoku" },
   { name: "Memory Matching", path: "/memory-matching" },
   { name: "Tic Tac Toe", path: "/tic-tac-toe" },
-  { name: "Maze Game", path: "/maze-game" },
+  { name: "Flappy Bird", path: "/flappy-bird" },
   { name: "Brick Breaker", path: "/brick-breaker" },
   { name: "Dots & Boxes", path: "/dots-boxes" },
-  { name: "Flappy Bird", path: "/flappy-bird" },
-  { name: "Minesweeper", path: "/minesweeper" },
-  { name: "Snake & Ladder", path: "/snake-ladder" },
 ];
 
 const Navbar = () => {

@@ -89,15 +89,15 @@ export default function Home() {
     },
     {
       id: 6,
-      name: "Maze Game",
-      category: "Adventure",
-      difficulty: "Medium",
+      name: "Flappy Bird",
+      category: "Arcade",
+      difficulty: "Hard",
       color: "from-green-500 via-emerald-500 to-teal-600",
-      icon: <Target className="w-6 h-6" />,
-      description: "Navigate through mazes",
-      route: "/maze-game",
+      icon: <Bird className="w-6 h-6" />,
+      description: "Navigate through pipes",
+      route: "/flappy-bird",
       players: "Single",
-      estimatedTime: "5-15 min",
+      estimatedTime: "5-10 min",
     },
     {
       id: 7,
@@ -123,45 +123,9 @@ export default function Home() {
       players: "Two",
       estimatedTime: "10-15 min",
     },
-    {
-      id: 9,
-      name: "Flappy Bird",
-      category: "Arcade",
-      difficulty: "Hard",
-color: "from-indigo-700 via-purple-700 to-violet-800",
-      icon: <Bird className="w-6 h-6" />,
-      description: "Navigate through pipes",
-      route: "/flappy-bird",
-      players: "Single",
-      estimatedTime: "5-10 min",
-    },
-    {
-      id: 10,
-      name: "Minesweeper",
-      category: "Logic",
-      difficulty: "Medium",
-color: "from-slate-600 via-zinc-700 to-slate-800",
-      icon: <Bomb className="w-6 h-6" />,
-      description: "Find mines without exploding",
-      route: "/minesweeper",
-      players: "Single",
-      estimatedTime: "10-20 min",
-    },
-    {
-      id: 11,
-      name: "Snake & Ladder",
-      category: "Classic",
-      difficulty: "Easy",
-color: "from-emerald-600 via-lime-600 to-green-700",
-      icon: <Dices className="w-6 h-6" />,
-      description: "Roll dice and climb to victory",
-      route: "/snake-ladder",
-      players: "Multiple",
-      estimatedTime: "15-25 min",
-    },
   ];
 
-  const categories = ["All", "Puzzle", "Classic", "Logic", "Memory", "Strategy", "Adventure", "Arcade"];
+  const categories = ["All", "Puzzle", "Classic", "Logic", "Memory", "Strategy", "Arcade"];
 
   const filteredGames = selectedCategory === "All" 
     ? games 
@@ -257,8 +221,7 @@ color: "from-emerald-600 via-lime-600 to-green-700",
             className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-6 min-h-[60px] sm:min-h-[80px] flex items-center justify-center"
           ></div>
 <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-  Experience classic games reimagined for the modern web. Challenge
-  your mind, test your reflexes, and have endless fun with our collection of {games.length} amazing games.
+  Experience classic games reimagined for the modern web.
 </p>
 
           <div className="flex flex-wrap justify-center gap-4 text-sm">
@@ -418,6 +381,7 @@ color: "from-emerald-600 via-lime-600 to-green-700",
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center hover:scale-110 transition-transform justify-center gap-3 mb-4">
+
 
 
             <img

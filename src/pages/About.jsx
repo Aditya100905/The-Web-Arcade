@@ -24,11 +24,11 @@ export default function About() {
       </p>
 
       {/* Features Grid */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <FeatureCard
           icon={<Users className="w-10 h-10 text-cyan-400" />}
           title="Community Driven"
-          desc="Join a growing community of passionate gamers and share your high scores and achievements."
+          desc="Join a growing community of passionate gamers."
         />
         <FeatureCard
           icon={<Smile className="w-10 h-10 text-pink-400" />}
