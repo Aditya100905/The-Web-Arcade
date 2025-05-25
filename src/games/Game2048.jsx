@@ -52,7 +52,7 @@
 //       const randomTile =
 //         emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
 //       currentBoard[randomTile.r][randomTile.c] = Math.random() < 0.1 ? 4 : 2;
-      
+
 //       // Add animation for new tile
 //       const tileKey = `${randomTile.r}-${randomTile.c}`;
 //       setAnimatedTiles(prev => new Set([...prev, tileKey]));
@@ -526,7 +526,6 @@
 
 // export default Game2048;
 
-
 import React, { useState, useEffect, useCallback } from "react";
 
 const Game2048 = () => {
@@ -545,7 +544,7 @@ const Game2048 = () => {
 
   const [highScore, setHighScore] = useState(() => {
     try {
-      const saved = localStorage.getItem('game2048-highscore');
+      const saved = localStorage.getItem("game2048-highscore");
       return saved ? parseInt(saved, 10) : 0;
     } catch (error) {
       return 0;
@@ -555,9 +554,9 @@ const Game2048 = () => {
   // Save high score to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem('game2048-highscore', highScore.toString());
+      localStorage.setItem("game2048-highscore", highScore.toString());
     } catch (error) {
-      console.warn('Could not save high score to localStorage');
+      console.warn("Could not save high score to localStorage");
     }
   }, [highScore]);
 
@@ -598,12 +597,12 @@ const Game2048 = () => {
       const randomTile =
         emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
       currentBoard[randomTile.r][randomTile.c] = Math.random() < 0.1 ? 4 : 2;
-      
+
       // Add animation for new tile
       const tileKey = `${randomTile.r}-${randomTile.c}`;
-      setAnimatedTiles(prev => new Set([...prev, tileKey]));
+      setAnimatedTiles((prev) => new Set([...prev, tileKey]));
       setTimeout(() => {
-        setAnimatedTiles(prev => {
+        setAnimatedTiles((prev) => {
           const newSet = new Set(prev);
           newSet.delete(tileKey);
           return newSet;
@@ -646,7 +645,7 @@ const Game2048 = () => {
   // Check for 2048 win condition
   const checkWin = (currentBoard) => {
     if (hasWon) return; // Already won
-    
+
     for (let r = 0; r < 4; r++) {
       for (let c = 0; c < 4; c++) {
         if (currentBoard[r][c] === 2048) {
@@ -922,10 +921,13 @@ const Game2048 = () => {
   }, [initializeGame]);
 
   const getTileStyle = (value, rowIndex, colIndex) => {
-    const baseStyle = "flex items-center justify-center font-bold border-4 transition-all duration-300 ease-in-out rounded-xl";
+    const baseStyle =
+      "flex items-center justify-center font-bold border-4 transition-all duration-300 ease-in-out rounded-xl";
     const tileKey = `${rowIndex}-${colIndex}`;
     const isAnimated = animatedTiles.has(tileKey);
-    const animationClass = isAnimated ? "animate-pulse scale-110" : "hover:scale-105";
+    const animationClass = isAnimated
+      ? "animate-pulse scale-110"
+      : "hover:scale-105";
 
     // Responsive text sizing
     const getTextSize = (val) => {
@@ -971,314 +973,8 @@ const Game2048 = () => {
     }
   };
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   return (
-  <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white flex flex-col justify-center items-center px-4 py-6 relative overflow-hidden">
-    {/* Animated background elements */}
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/2 w-60 h-60 bg-orange-500/5 rounded-full blur-2xl animate-pulse delay-500"></div>
-    </div>
-
-    <div className="w-full max-w-7xl mx-auto relative z-10 flex flex-col items-center">
-      {/* Title - Always Centered */}
-      <div className="text-center mb-6 lg:mb-8">
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent drop-shadow-2xl animate-pulse">
-          2048
-        </h1>
-        <div className="text-amber-300/70 text-sm lg:text-base mt-2 lg:mt-3 font-medium tracking-wide">
-          Join the numbers and get to the 2048 tile!
-        </div>
-      </div>
-
-      {/* Mobile Layout */}
-      <div className="lg:hidden w-full max-w-md mx-auto font-sans space-y-6">
-        {/* Scores */}
-        <div className="flex justify-center gap-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-4 py-3 shadow-2xl border border-slate-700/50 backdrop-blur-sm flex-1 max-w-32 text-center">
-            <div className="text-xs text-amber-400 font-semibold tracking-wider uppercase">Score</div>
-            <div className="text-xl sm:text-2xl font-black text-white bg-gradient-to-r from-white to-amber-100 bg-clip-text">{score.toLocaleString()}</div>
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-4 py-3 shadow-2xl border border-slate-700/50 backdrop-blur-sm flex-1 max-w-32 text-center">
-            <div className="text-xs text-emerald-400 font-semibold tracking-wider uppercase">Best</div>
-            <div className="text-xl sm:text-2xl font-black text-white bg-gradient-to-r from-white to-emerald-100 bg-clip-text">{highScore.toLocaleString()}</div>
-          </div>
-        </div>
-
-        {/* Game Board */}
-        <div className="flex justify-center">
-          <div
-            className="p-3 sm:p-4 grid grid-cols-4 gap-2 sm:gap-3 rounded-2xl shadow-2xl backdrop-blur-sm border border-slate-600/30"
-            style={{
-              background: "linear-gradient(145deg, rgba(45, 45, 45, 0.9) 0%, rgba(31, 31, 31, 0.9) 100%)",
-              width: "min(90vw, 320px)",
-              aspectRatio: "1 / 1",
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          >
-            {board.map((row, rowIndex) =>
-              row.map((value, colIndex) => (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className={getTileStyle(value, rowIndex, colIndex)}
-                  style={{
-                    border: "3px solid rgba(75, 85, 99, 0.6)",
-                  }}
-                >
-                  {value !== 0 && <span className="drop-shadow-sm">{value}</span>}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Control Buttons */}
-        <div className="flex justify-center">
-          <div className="grid grid-cols-3 gap-3 text-xl font-bold text-white">
-            <div></div>
-            <button
-              onClick={moveUp}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ↑
-            </button>
-            <div></div>
-            <button
-              onClick={moveLeft}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ←
-            </button>
-            <button
-              onClick={moveDown}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ↓
-            </button>
-            <button
-              onClick={moveRight}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              →
-            </button>
-          </div>
-        </div>
-
-        {/* Game Over Text */}
-        {gameOver && !showGameOverPopup && (
-          <div className="text-red-400 font-bold text-base bg-red-900/20 px-6 py-3 rounded-lg border border-red-500/30 backdrop-blur-sm animate-pulse text-center">
-            🎮 Game Over! No more moves available.
-          </div>
-        )}
-
-        {/* Reset Button */}
-        <div className="flex justify-center">
-          <button
-            onClick={initializeGame}
-            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-4 px-8 rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-amber-500/40 border border-amber-500/50 backdrop-blur-sm"
-          >
-            <span className="flex items-center gap-3 text-lg">
-              🔄 <span>New Game</span>
-            </span>
-          </button>
-        </div>
-
-        {/* Instructions */}
-        <div className="text-center text-amber-300/80 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-4 border border-amber-500/20 backdrop-blur-sm mx-4">
-          <p className="mb-1">🎯 <strong>Use arrow keys, buttons, or swipe</strong> to move tiles</p>
-          <p>✨ When two tiles with the same number touch, they merge into one!</p>
-        </div>
-      </div>
-
-      {/* Desktop Layout */}
-      <div className="hidden lg:flex items-start justify-center gap-8 xl:gap-12 font-sans w-full max-w-6xl">
-        {/* Left Side - Scores and Controls */}
-        <div className="flex flex-col items-center space-y-8 min-w-64">
-          {/* Scores */}
-          <div className="flex flex-col gap-6 w-full">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-8 py-6 shadow-2xl border border-slate-700/50 backdrop-blur-sm text-center">
-              <div className="text-sm text-amber-400 font-semibold tracking-wider uppercase">Current Score</div>
-              <div className="text-4xl font-black text-white bg-gradient-to-r from-white to-amber-100 bg-clip-text">{score.toLocaleString()}</div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-8 py-6 shadow-2xl border border-slate-700/50 backdrop-blur-sm text-center">
-              <div className="text-sm text-emerald-400 font-semibold tracking-wider uppercase">High Score</div>
-              <div className="text-4xl font-black text-white bg-gradient-to-r from-white to-emerald-100 bg-clip-text">{highScore.toLocaleString()}</div>
-            </div>
-          </div>
-
-          {/* Reset Button */}
-          <button
-            onClick={initializeGame}
-            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-4 px-10 rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-amber-500/40 border border-amber-500/50 backdrop-blur-sm w-full"
-          >
-            <span className="flex items-center justify-center gap-3 text-lg">
-              🔄 <span>New Game</span>
-            </span>
-          </button>
-
-          {/* Game Over Text */}
-          {gameOver && !showGameOverPopup && (
-            <div className="text-red-400 font-bold text-lg bg-red-900/20 px-6 py-3 rounded-lg border border-red-500/30 backdrop-blur-sm animate-pulse text-center">
-              🎮 Game Over! No more moves available.
-            </div>
-          )}
-
-          {/* Instructions */}
-          <div className="text-center text-amber-300/80 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-6 border border-amber-500/20 backdrop-blur-sm">
-            <p className="mb-2">🎯 <strong>Use arrow keys or buttons</strong> to move tiles</p>
-            <p>✨ When two tiles with the same number touch, they merge into one!</p>
-          </div>
-        </div>
-
-        {/* Center - Game Board */}
-        <div className="flex justify-center">
-          <div
-            className="p-6 grid grid-cols-4 gap-4 rounded-2xl shadow-2xl backdrop-blur-sm border border-slate-600/30"
-            style={{
-              background: "linear-gradient(145deg, rgba(45, 45, 45, 0.9) 0%, rgba(31, 31, 31, 0.9) 100%)",
-              width: "480px",
-              height: "480px",
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          >
-            {board.map((row, rowIndex) =>
-              row.map((value, colIndex) => (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className={getTileStyle(value, rowIndex, colIndex)}
-                  style={{
-                    border: "3px solid rgba(75, 85, 99, 0.6)",
-                    width: "100px",
-                    height: "100px",
-                  }}
-                >
-                  {value !== 0 && <span className="drop-shadow-sm">{value}</span>}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Right Side - Control Buttons */}
-        <div className="flex flex-col items-center space-y-8 min-w-64">
-          <div className="text-center text-amber-300/90 text-lg font-semibold">
-            Controls
-          </div>
-          
-          <div className="grid grid-cols-3 gap-4 text-2xl font-bold text-white">
-            <div></div>
-            <button
-              onClick={moveUp}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 rounded-xl shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ↑
-            </button>
-            <div></div>
-            <button
-              onClick={moveLeft}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 rounded-xl shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ←
-            </button>
-            <button
-              onClick={moveDown}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 rounded-xl shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ↓
-            </button>
-            <button
-              onClick={moveRight}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 rounded-xl shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              →
-            </button>
-          </div>
-
-          <div className="text-center text-amber-300/70 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-4 border border-amber-500/20 backdrop-blur-sm">
-            <p className="mb-1">⌨️ <strong>Arrow Keys</strong></p>
-            <p>🖱️ <strong>Click Buttons</strong></p>
-          </div>
-        </div>
-      </div>
-
-      {/* Win Popup */}
-      {showWinPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/50">
-          <div className="bg-gradient-to-br from-yellow-500 to-amber-600 text-white px-12 py-8 rounded-2xl shadow-2xl text-center border border-yellow-400/50 animate-bounce mx-4">
-            <div className="text-6xl mb-4">🎉</div>
-            <div className="text-3xl font-bold mb-2">You Win!</div>
-            <div className="text-yellow-100 text-lg">You reached 2048!</div>
-            <div className="text-yellow-200 text-sm mt-2">Keep playing to beat your high score!</div>
-          </div>
-        </div>
-      )}
-
-      {/* Game Over Popup */}
-      {showGameOverPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/50">
-          <div className="bg-gradient-to-br from-red-600 to-red-700 text-white px-12 py-8 rounded-2xl shadow-2xl text-center border border-red-500/50 animate-bounce mx-4">
-            <div className="text-4xl mb-4">💥</div>
-            <div className="text-2xl font-bold mb-2">Game Over!</div>
-            <div className="text-red-200">No more moves available</div>
-            <div className="text-red-300 text-sm mt-2">Final Score: {score.toLocaleString()}</div>
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white flex justify-center items-center px-4 py-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white flex flex-col justify-center items-center px-4 py-6 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -left-40 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -1286,99 +982,105 @@ const Game2048 = () => {
         <div className="absolute top-1/2 left-1/2 w-60 h-60 bg-orange-500/5 rounded-full blur-2xl animate-pulse delay-500"></div>
       </div>
 
-      <div className="w-full max-w-7xl mx-auto relative z-10">
-        {/* Mobile Layout */}
-        <div className="lg:hidden flex flex-col items-center font-sans space-y-6">
-          {/* Title */}
-          <div className="text-center">
-            <h1 className="text-5xl sm:text-6xl font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent drop-shadow-2xl animate-pulse">
-              2048
-            </h1>
-            <div className="text-amber-300/70 text-sm mt-2 font-medium tracking-wide">
-              Join the numbers and get to the 2048 tile!
-            </div>
+      <div className="w-full max-w-7xl mx-auto relative z-10 flex flex-col items-center">
+        {/* Title - Always Centered */}
+        <div className="text-center mb-6 lg:mb-8">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent drop-shadow-2xl animate-pulse">
+            2048
+          </h1>
+          <div className="text-amber-300/70 text-sm lg:text-base mt-2 lg:mt-3 font-medium tracking-wide">
+            Join the numbers and get to the 2048 tile!
           </div>
+        </div>
 
+        {/* Mobile Layout */}
+        <div className="lg:hidden w-full max-w-md mx-auto font-sans space-y-6">
           {/* Scores */}
-          <div className="flex justify-center gap-4 w-full px-4">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-4 py-3 shadow-2xl border border-slate-700/50 backdrop-blur-sm flex-1 max-w-32">
-              <div className="text-xs text-amber-400 font-semibold tracking-wider uppercase">Score</div>
-              <div className="text-xl sm:text-2xl font-black text-white bg-gradient-to-r from-white to-amber-100 bg-clip-text">{score.toLocaleString()}</div>
+          <div className="flex justify-center gap-4">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-4 py-3 shadow-2xl border border-slate-700/50 backdrop-blur-sm flex-1 max-w-32 text-center">
+              <div className="text-xs text-amber-400 font-semibold tracking-wider uppercase">
+                Score
+              </div>
+              <div className="text-xl sm:text-2xl font-black text-white bg-gradient-to-r from-white to-amber-100 bg-clip-text">
+                {score.toLocaleString()}
+              </div>
             </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-4 py-3 shadow-2xl border border-slate-700/50 backdrop-blur-sm flex-1 max-w-32">
-              <div className="text-xs text-emerald-400 font-semibold tracking-wider uppercase">Best</div>
-              <div className="text-xl sm:text-2xl font-black text-white bg-gradient-to-r from-white to-emerald-100 bg-clip-text">{highScore.toLocaleString()}</div>
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-4 py-3 shadow-2xl border border-slate-700/50 backdrop-blur-sm flex-1 max-w-32 text-center">
+              <div className="text-xs text-emerald-400 font-semibold tracking-wider uppercase">
+                Best
+              </div>
+              <div className="text-xl sm:text-2xl font-black text-white bg-gradient-to-r from-white to-emerald-100 bg-clip-text">
+                {highScore.toLocaleString()}
+              </div>
             </div>
           </div>
 
           {/* Game Board */}
-          <div
-            className="p-3 sm:p-4 grid grid-cols-4 gap-2 sm:gap-3 mx-auto rounded-2xl shadow-2xl backdrop-blur-sm border border-slate-600/30 w-full max-w-sm"
-            style={{
-              background: "linear-gradient(145deg, rgba(45, 45, 45, 0.9) 0%, rgba(31, 31, 31, 0.9) 100%)",
-              aspectRatio: "1 / 1",
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          >
-            {board.map((row, rowIndex) =>
-              row.map((value, colIndex) => (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className={getTileStyle(value, rowIndex, colIndex)}
-                  style={{
-                    border: "3px solid rgba(75, 85, 99, 0.6)",
-                  }}
-                >
-                  {value !== 0 && <span className="drop-shadow-sm">{value}</span>}
-                </div>
-              ))
-            )}
+          <div className="flex justify-center">
+            <div
+              className="p-3 sm:p-4 grid grid-cols-4 gap-2 sm:gap-3 rounded-2xl shadow-2xl backdrop-blur-sm border border-slate-600/30"
+              style={{
+                background:
+                  "linear-gradient(145deg, rgba(45, 45, 45, 0.9) 0%, rgba(31, 31, 31, 0.9) 100%)",
+                width: "min(90vw, 320px)",
+                aspectRatio: "1 / 1",
+              }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              {board.map((row, rowIndex) =>
+                row.map((value, colIndex) => (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    className={getTileStyle(value, rowIndex, colIndex)}
+                    style={{
+                      border: "3px solid rgba(75, 85, 99, 0.6)",
+                    }}
+                  >
+                    {value !== 0 && (
+                      <span className="drop-shadow-sm">{value}</span>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           {/* Control Buttons */}
-          <div className="grid grid-cols-3 gap-3 text-xl font-bold text-white">
-            <div></div>
-            <button
-              onClick={moveUp}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ↑
-            </button>
-            <div></div>
-            <button
-              onClick={moveLeft}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ←
-            </button>
-            <button
-              onClick={moveDown}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              ↓
-            </button>
-            <button
-              onClick={moveRight}
-              disabled={gameOver}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
-            >
-              →
-            </button>
+          <div className="flex justify-center">
+            <div className="grid grid-cols-3 gap-3 text-xl font-bold text-white">
+              <div></div>
+              <button
+                onClick={moveUp}
+                disabled={gameOver}
+                className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
+              >
+                ↑
+              </button>
+              <div></div>
+              <button
+                onClick={moveLeft}
+                disabled={gameOver}
+                className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
+              >
+                ←
+              </button>
+              <button
+                onClick={moveDown}
+                disabled={gameOver}
+                className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
+              >
+                ↓
+              </button>
+              <button
+                onClick={moveRight}
+                disabled={gameOver}
+                className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-amber-500 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-3 rounded-lg shadow-lg border border-gray-600 hover:border-amber-400 transition-all duration-200 hover:scale-110 hover:shadow-amber-500/30 backdrop-blur-sm"
+              >
+                →
+              </button>
+            </div>
           </div>
-
-          {/* Reset Button */}
-          <button
-            onClick={initializeGame}
-            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-4 px-8 rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-amber-500/40 border border-amber-500/50 backdrop-blur-sm"
-          >
-            <span className="flex items-center gap-3 text-lg">
-              🔄 <span>New Game</span>
-            </span>
-          </button>
 
           {/* Game Over Text */}
           {gameOver && !showGameOverPopup && (
@@ -1387,97 +1089,122 @@ const Game2048 = () => {
             </div>
           )}
 
+          {/* Reset Button */}
+          <div className="flex justify-center">
+            <button
+              onClick={initializeGame}
+              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-4 px-8 rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-amber-500/40 border border-amber-500/50 backdrop-blur-sm"
+            >
+              <span className="flex items-center gap-3 text-lg">
+                🔄 <span>New Game</span>
+              </span>
+            </button>
+          </div>
+
           {/* Instructions */}
-          <div className="text-center text-amber-300/80 text-sm px-4 leading-relaxed bg-slate-900/30 rounded-lg p-4 border border-amber-500/20 backdrop-blur-sm">
-            <p className="mb-1">🎯 <strong>Use arrow keys, buttons, or swipe</strong> to move tiles</p>
-            <p>✨ When two tiles with the same number touch, they merge into one!</p>
+          <div className="text-center text-amber-300/80 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-4 border border-amber-500/20 backdrop-blur-sm mx-4">
+            <p className="mb-1">
+              🎯 <strong>Use arrow keys, buttons, or swipe</strong> to move
+              tiles
+            </p>
+            <p>
+              ✨ When two tiles with the same number touch, they merge into one!
+            </p>
           </div>
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden lg:flex items-center justify-center gap-12 xl:gap-16 font-sans">
-          {/* Left Side - Title and Scores */}
-          <div className="flex flex-col items-center space-y-8">
-            {/* Title */}
-            <div className="text-center">
-              <h1 className="text-7xl xl:text-8xl font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent drop-shadow-2xl animate-pulse">
-                2048
-              </h1>
-              <div className="text-amber-300/70 text-base mt-3 font-medium tracking-wide">
-                Join the numbers and get to the 2048 tile!
-              </div>
-            </div>
-
+        <div className="hidden lg:flex items-start justify-center gap-8 xl:gap-12 font-sans w-full max-w-6xl">
+          {/* Left Side - Scores and Controls */}
+          <div className="flex flex-col items-center space-y-8 min-w-64">
             {/* Scores */}
-            <div className="flex flex-col gap-6">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-8 py-6 shadow-2xl border border-slate-700/50 backdrop-blur-sm min-w-48">
-                <div className="text-sm text-amber-400 font-semibold tracking-wider uppercase">Current Score</div>
-                <div className="text-4xl font-black text-white bg-gradient-to-r from-white to-amber-100 bg-clip-text">{score.toLocaleString()}</div>
+            <div className="flex flex-col gap-6 w-full">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-8 py-6 shadow-2xl border border-slate-700/50 backdrop-blur-sm text-center">
+                <div className="text-sm text-amber-400 font-semibold tracking-wider uppercase">
+                  Current Score
+                </div>
+                <div className="text-4xl font-black text-white bg-gradient-to-r from-white to-amber-100 bg-clip-text">
+                  {score.toLocaleString()}
+                </div>
               </div>
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-8 py-6 shadow-2xl border border-slate-700/50 backdrop-blur-sm min-w-48">
-                <div className="text-sm text-emerald-400 font-semibold tracking-wider uppercase">High Score</div>
-                <div className="text-4xl font-black text-white bg-gradient-to-r from-white to-emerald-100 bg-clip-text">{highScore.toLocaleString()}</div>
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl px-8 py-6 shadow-2xl border border-slate-700/50 backdrop-blur-sm text-center">
+                <div className="text-sm text-emerald-400 font-semibold tracking-wider uppercase">
+                  High Score
+                </div>
+                <div className="text-4xl font-black text-white bg-gradient-to-r from-white to-emerald-100 bg-clip-text">
+                  {highScore.toLocaleString()}
+                </div>
               </div>
             </div>
 
             {/* Reset Button */}
             <button
               onClick={initializeGame}
-              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-4 px-10 rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-amber-500/40 border border-amber-500/50 backdrop-blur-sm"
+              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-4 px-10 rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-amber-500/40 border border-amber-500/50 backdrop-blur-sm w-full"
             >
-              <span className="flex items-center gap-3 text-lg">
+              <span className="flex items-center justify-center gap-3 text-lg">
                 🔄 <span>New Game</span>
               </span>
             </button>
 
             {/* Game Over Text */}
             {gameOver && !showGameOverPopup && (
-              <div className="text-red-400 font-bold text-lg bg-red-900/20 px-6 py-3 rounded-lg border border-red-500/30 backdrop-blur-sm animate-pulse">
+              <div className="text-red-400 font-bold text-lg bg-red-900/20 px-6 py-3 rounded-lg border border-red-500/30 backdrop-blur-sm animate-pulse text-center">
                 🎮 Game Over! No more moves available.
               </div>
             )}
 
             {/* Instructions */}
-            <div className="text-center text-amber-300/80 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-6 border border-amber-500/20 backdrop-blur-sm max-w-xs">
-              <p className="mb-2">🎯 <strong>Use arrow keys or buttons</strong> to move tiles</p>
-              <p>✨ When two tiles with the same number touch, they merge into one!</p>
+            <div className="text-center text-amber-300/80 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-6 border border-amber-500/20 backdrop-blur-sm">
+              <p className="mb-2">
+                🎯 <strong>Use arrow keys or buttons</strong> to move tiles
+              </p>
+              <p>
+                ✨ When two tiles with the same number touch, they merge into
+                one!
+              </p>
             </div>
           </div>
 
           {/* Center - Game Board */}
-          <div
-            className="p-6 grid grid-cols-4 gap-4 rounded-2xl shadow-2xl backdrop-blur-sm border border-slate-600/30"
-            style={{
-              background: "linear-gradient(145deg, rgba(45, 45, 45, 0.9) 0%, rgba(31, 31, 31, 0.9) 100%)",
-              width: "480px",
-              height: "480px",
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          >
-            {board.map((row, rowIndex) =>
-              row.map((value, colIndex) => (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className={getTileStyle(value, rowIndex, colIndex)}
-                  style={{
-                    border: "3px solid rgba(75, 85, 99, 0.6)",
-                    width: "100px",
-                    height: "100px",
-                  }}
-                >
-                  {value !== 0 && <span className="drop-shadow-sm">{value}</span>}
-                </div>
-              ))
-            )}
+          <div className="flex justify-center">
+            <div
+              className="p-6 grid grid-cols-4 gap-4 rounded-2xl shadow-2xl backdrop-blur-sm border border-slate-600/30"
+              style={{
+                background:
+                  "linear-gradient(145deg, rgba(45, 45, 45, 0.9) 0%, rgba(31, 31, 31, 0.9) 100%)",
+                width: "480px",
+                height: "480px",
+              }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              {board.map((row, rowIndex) =>
+                row.map((value, colIndex) => (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    className={getTileStyle(value, rowIndex, colIndex)}
+                    style={{
+                      border: "3px solid rgba(75, 85, 99, 0.6)",
+                      width: "100px",
+                      height: "100px",
+                    }}
+                  >
+                    {value !== 0 && (
+                      <span className="drop-shadow-sm">{value}</span>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           {/* Right Side - Control Buttons */}
-          <div className="flex flex-col items-center space-y-8">
-            <div className="text-center text-amber-300/90 text-lg font-semibold mb-4">
+          <div className="flex flex-col items-center space-y-8 min-w-64">
+            <div className="text-center text-amber-300/90 text-lg font-semibold">
               Controls
             </div>
-            
+
             <div className="grid grid-cols-3 gap-4 text-2xl font-bold text-white">
               <div></div>
               <button
@@ -1511,9 +1238,13 @@ const Game2048 = () => {
               </button>
             </div>
 
-            <div className="text-center text-amber-300/70 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-4 border border-amber-500/20 backdrop-blur-sm max-w-xs">
-              <p className="mb-1">⌨️ <strong>Arrow Keys</strong></p>
-              <p>🖱️ <strong>Click Buttons</strong></p>
+            <div className="text-center text-amber-300/70 text-sm leading-relaxed bg-slate-900/30 rounded-lg p-4 border border-amber-500/20 backdrop-blur-sm">
+              <p className="mb-1">
+                ⌨️ <strong>Arrow Keys</strong>
+              </p>
+              <p>
+                🖱️ <strong>Click Buttons</strong>
+              </p>
             </div>
           </div>
         </div>
@@ -1521,11 +1252,13 @@ const Game2048 = () => {
         {/* Win Popup */}
         {showWinPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/50">
-            <div className="bg-gradient-to-br from-yellow-500 to-amber-600 text-white px-12 py-8 rounded-2xl shadow-2xl text-center border border-yellow-400/50 animate-bounce">
+            <div className="bg-gradient-to-br from-yellow-500 to-amber-600 text-white px-12 py-8 rounded-2xl shadow-2xl text-center border border-yellow-400/50 animate-bounce mx-4">
               <div className="text-6xl mb-4">🎉</div>
               <div className="text-3xl font-bold mb-2">You Win!</div>
               <div className="text-yellow-100 text-lg">You reached 2048!</div>
-              <div className="text-yellow-200 text-sm mt-2">Keep playing to beat your high score!</div>
+              <div className="text-yellow-200 text-sm mt-2">
+                Keep playing to beat your high score!
+              </div>
             </div>
           </div>
         )}
@@ -1533,17 +1266,20 @@ const Game2048 = () => {
         {/* Game Over Popup */}
         {showGameOverPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/50">
-            <div className="bg-gradient-to-br from-red-600 to-red-700 text-white px-12 py-8 rounded-2xl shadow-2xl text-center border border-red-500/50 animate-bounce">
+            <div className="bg-gradient-to-br from-red-600 to-red-700 text-white px-12 py-8 rounded-2xl shadow-2xl text-center border border-red-500/50 animate-bounce mx-4">
               <div className="text-4xl mb-4">💥</div>
               <div className="text-2xl font-bold mb-2">Game Over!</div>
               <div className="text-red-200">No more moves available</div>
-              <div className="text-red-300 text-sm mt-2">Final Score: {score.toLocaleString()}</div>
+              <div className="text-red-300 text-sm mt-2">
+                Final Score: {score.toLocaleString()}
+              </div>
             </div>
           </div>
         )}
       </div>
     </div>
   );
+
 };
 
 export default Game2048;

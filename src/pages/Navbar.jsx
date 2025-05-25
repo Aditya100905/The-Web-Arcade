@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Gamepad2, ChevronDown, Menu, X } from "lucide-react";
 
@@ -55,17 +50,14 @@ const Navbar = () => {
   );
 
   // Close menus on Escape key
-  const handleKeyDown = useCallback(
-    (event) => {
-      if (event.key === "Escape") {
-        setGamesDropdownOpen(false);
-        setMobileMenuOpen(false);
-        setMobileGamesDropdownOpen(false);
-        gamesButtonRef.current?.focus();
-      }
-    },
-    []
-  );
+  const handleKeyDown = useCallback((event) => {
+    if (event.key === "Escape") {
+      setGamesDropdownOpen(false);
+      setMobileMenuOpen(false);
+      setMobileGamesDropdownOpen(false);
+      gamesButtonRef.current?.focus();
+    }
+  }, []);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -132,13 +124,27 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           {/* Logo */}
-          <Link
+
+          {/* <Link
             to="/"
             className="flex items-center gap-2 text-2xl font-bold hover:text-cyan-400 transition-colors duration-200"
             aria-label="Go to homepage"
           >
             <Gamepad2 className="text-cyan-400" />
-            Web Arcade
+            The Web Arcade
+          </Link> */}
+
+          <Link
+            to="/"
+            className="flex items-center gap-4 text-3xl font-bold hover:text-cyan-400 transition-colors duration-200"
+            aria-label="Go to homepage"
+          >
+            <img
+              src="/logo.png"
+              alt="The Web Arcade Logo"
+              className="w-14 h-14 hover:scale-110 transition-transform rounded-full border-2 border-white shadow-lg object-cover"
+            />
+            The Web Arcade
           </Link>
 
           {/* Desktop Menu */}
@@ -217,7 +223,9 @@ const Navbar = () => {
               if (mobileMenuOpen) setMobileGamesDropdownOpen(false);
             }}
             className="md:hidden focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded"
-            aria-label={mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}
+            aria-label={
+              mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"
+            }
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (

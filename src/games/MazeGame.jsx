@@ -32,7 +32,16 @@ export default function MazeGame() {
     function handleKeyDown(e) {
       if (!playing) return;
 
-      const validKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d"];
+      const validKeys = [
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "w",
+        "a",
+        "s",
+        "d",
+      ];
       if (validKeys.includes(e.key)) {
         e.preventDefault();
         // Example: Increment moves on valid move keys

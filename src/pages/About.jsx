@@ -17,7 +17,10 @@ export default function About() {
 
       {/* Description */}
       <p className="max-w-3xl mx-auto text-center text-gray-300 text-lg sm:text-xl leading-relaxed mb-16 px-4 sm:px-0">
-        Web Arcade is your ultimate destination for classic and modern games reimagined for the web. Whether you're here to challenge your mind, test your reflexes, or just have some fun, we bring you a curated collection of engaging games — all in one place.
+        Web Arcade is your ultimate destination for classic and modern games
+        reimagined for the web. Whether you're here to challenge your mind, test
+        your reflexes, or just have some fun, we bring you a curated collection
+        of engaging games — all in one place.
       </p>
 
       {/* Features Grid */}
@@ -50,7 +53,11 @@ export default function About() {
           Our Mission
         </h2>
         <p className="text-gray-300 text-center text-lg leading-relaxed px-6">
-          At Web Arcade, we strive to create a vibrant and fun online gaming hub that rekindles the joy of classic games while embracing modern web technology. Our mission is to provide an inclusive platform where players can relax, compete, and connect — all through the power of play.
+          At Web Arcade, we strive to create a vibrant and fun online gaming hub
+          that rekindles the joy of classic games while embracing modern web
+          technology. Our mission is to provide an inclusive platform where
+          players can relax, compete, and connect — all through the power of
+          play.
         </p>
       </section>
     </div>

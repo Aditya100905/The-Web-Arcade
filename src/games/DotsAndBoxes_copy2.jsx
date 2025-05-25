@@ -288,17 +288,17 @@ const DotsAndBoxes_copy2 = () => {
       typeof window !== "undefined" ? window.innerWidth : 1024;
     const screenHeight =
       typeof window !== "undefined" ? window.innerHeight : 768;
-    
+
     // Calculate available space more carefully
     const availableWidth = Math.min(screenWidth - 40, 700);
     const availableHeight = Math.min(screenHeight - 300, 700);
     const availableSize = Math.min(availableWidth, availableHeight);
-    
+
     // Calculate cell size based on grid size
     const cellSize = Math.max(30, Math.min(80, availableSize / gridSize));
     const lineThickness = Math.max(3, Math.min(6, cellSize * 0.08));
     const dotSize = Math.max(8, Math.min(16, cellSize * 0.25));
-    
+
     return {
       cellSize,
       lineThickness,
@@ -455,7 +455,8 @@ const DotsAndBoxes_copy2 = () => {
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-white/10 via-white/5 to-transparent backdrop-blur-sm rounded-full border border-white/20">
               <div className="w-2 h-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full animate-pulse"></div>
               <p className="text-cyan-200 text-xs sm:text-sm font-medium">
-                {gameMode === "pvc" ? "Player vs Computer" : "Player vs Player"} • {gridSize}×{gridSize}
+                {gameMode === "pvc" ? "Player vs Computer" : "Player vs Player"}{" "}
+                • {gridSize}×{gridSize}
               </p>
             </div>
           </div>
@@ -514,9 +515,8 @@ const DotsAndBoxes_copy2 = () => {
             <div className="relative group">
               <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-600/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-70 transition-all duration-500"></div>
               <div className="relative bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/20 shadow-2xl">
-                
                 {/* Game Grid */}
-                <div 
+                <div
                   className="relative mx-auto"
                   style={{
                     width: `${gridDimensions.containerSize}px`,
@@ -534,7 +534,9 @@ const DotsAndBoxes_copy2 = () => {
                           top: `${row * gridDimensions.cellSize}px`,
                           width: `${gridDimensions.dotSize}px`,
                           height: `${gridDimensions.dotSize}px`,
-                          transform: `translate(-${gridDimensions.dotSize/2}px, -${gridDimensions.dotSize/2}px)`,
+                          transform: `translate(-${
+                            gridDimensions.dotSize / 2
+                          }px, -${gridDimensions.dotSize / 2}px)`,
                         }}
                       />
                     ))
@@ -547,20 +549,29 @@ const DotsAndBoxes_copy2 = () => {
                       const isSelected = isLineSelected(lineId);
                       const isHovered = hoveredLine === lineId;
                       const isAnimating = animate && lastMove === lineId;
-                      
+
                       return (
                         <div
                           key={lineId}
                           className={`absolute cursor-pointer transition-all duration-300 rounded-full z-10 ${
-                            isSelected? "bg-gradient-to-r from-red-400 via-pink-400 to-red-500 shadow-lg border-2 border-red-300"
-                            : isHovered
-                            ? "bg-gradient-to-r from-white/40 via-white/30 to-white/40 shadow-md border border-white/50"
-                            : "bg-gradient-to-r from-white/20 via-white/15 to-white/20 hover:from-white/30 hover:via-white/25 hover:to-white/30 border border-white/30"
+                            isSelected
+                              ? "bg-gradient-to-r from-red-400 via-pink-400 to-red-500 shadow-lg border-2 border-red-300"
+                              : isHovered
+                              ? "bg-gradient-to-r from-white/40 via-white/30 to-white/40 shadow-md border border-white/50"
+                              : "bg-gradient-to-r from-white/20 via-white/15 to-white/20 hover:from-white/30 hover:via-white/25 hover:to-white/30 border border-white/30"
                           } ${isAnimating ? "animate-pulse scale-110" : ""}`}
                           style={{
-                            left: `${col * gridDimensions.cellSize + gridDimensions.dotSize/2}px`,
-                            top: `${row * gridDimensions.cellSize - gridDimensions.lineThickness/2}px`,
-                            width: `${gridDimensions.cellSize - gridDimensions.dotSize}px`,
+                            left: `${
+                              col * gridDimensions.cellSize +
+                              gridDimensions.dotSize / 2
+                            }px`,
+                            top: `${
+                              row * gridDimensions.cellSize -
+                              gridDimensions.lineThickness / 2
+                            }px`,
+                            width: `${
+                              gridDimensions.cellSize - gridDimensions.dotSize
+                            }px`,
                             height: `${gridDimensions.lineThickness}px`,
                           }}
                           onClick={() => handleLineClick(lineId)}
@@ -578,22 +589,30 @@ const DotsAndBoxes_copy2 = () => {
                       const isSelected = isLineSelected(lineId);
                       const isHovered = hoveredLine === lineId;
                       const isAnimating = animate && lastMove === lineId;
-                      
+
                       return (
                         <div
                           key={lineId}
                           className={`absolute cursor-pointer transition-all duration-300 rounded-full z-10 ${
                             isSelected
-                            ? "bg-gradient-to-b from-cyan-400 via-blue-400 to-indigo-500 shadow-lg border-2 border-cyan-300"
-                            : isHovered
-                            ? "bg-gradient-to-b from-white/40 via-white/30 to-white/40 shadow-md border border-white/50"
-                            : "bg-gradient-to-b from-white/20 via-white/15 to-white/20 hover:from-white/30 hover:via-white/25 hover:to-white/30 border border-white/30"
+                              ? "bg-gradient-to-b from-cyan-400 via-blue-400 to-indigo-500 shadow-lg border-2 border-cyan-300"
+                              : isHovered
+                              ? "bg-gradient-to-b from-white/40 via-white/30 to-white/40 shadow-md border border-white/50"
+                              : "bg-gradient-to-b from-white/20 via-white/15 to-white/20 hover:from-white/30 hover:via-white/25 hover:to-white/30 border border-white/30"
                           } ${isAnimating ? "animate-pulse scale-110" : ""}`}
                           style={{
-                            left: `${col * gridDimensions.cellSize - gridDimensions.lineThickness/2}px`,
-                            top: `${row * gridDimensions.cellSize + gridDimensions.dotSize/2}px`,
+                            left: `${
+                              col * gridDimensions.cellSize -
+                              gridDimensions.lineThickness / 2
+                            }px`,
+                            top: `${
+                              row * gridDimensions.cellSize +
+                              gridDimensions.dotSize / 2
+                            }px`,
                             width: `${gridDimensions.lineThickness}px`,
-                            height: `${gridDimensions.cellSize - gridDimensions.dotSize}px`,
+                            height: `${
+                              gridDimensions.cellSize - gridDimensions.dotSize
+                            }px`,
                           }}
                           onClick={() => handleLineClick(lineId)}
                           onMouseEnter={() => setHoveredLine(lineId)}
@@ -608,7 +627,7 @@ const DotsAndBoxes_copy2 = () => {
                     const [, row, col] = box.id.split("-");
                     const boxRow = parseInt(row);
                     const boxCol = parseInt(col);
-                    
+
                     return (
                       <div
                         key={box.id}
@@ -618,10 +637,20 @@ const DotsAndBoxes_copy2 = () => {
                             : "bg-gradient-to-br from-cyan-400/30 via-blue-400/20 to-indigo-500/30 border-cyan-400/50"
                         }`}
                         style={{
-                          left: `${boxCol * gridDimensions.cellSize + gridDimensions.dotSize/2}px`,
-                          top: `${boxRow * gridDimensions.cellSize + gridDimensions.dotSize/2}px`,
-                          width: `${gridDimensions.cellSize - gridDimensions.dotSize}px`,
-                          height: `${gridDimensions.cellSize - gridDimensions.dotSize}px`,
+                          left: `${
+                            boxCol * gridDimensions.cellSize +
+                            gridDimensions.dotSize / 2
+                          }px`,
+                          top: `${
+                            boxRow * gridDimensions.cellSize +
+                            gridDimensions.dotSize / 2
+                          }px`,
+                          width: `${
+                            gridDimensions.cellSize - gridDimensions.dotSize
+                          }px`,
+                          height: `${
+                            gridDimensions.cellSize - gridDimensions.dotSize
+                          }px`,
                         }}
                       >
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -648,7 +677,7 @@ const DotsAndBoxes_copy2 = () => {
               <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 relative z-10" />
               <span className="relative z-10 text-sm sm:text-base">Reset</span>
             </button>
-            
+
             <button
               onClick={backToMenu}
               className="group bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg relative overflow-hidden"
@@ -664,7 +693,9 @@ const DotsAndBoxes_copy2 = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
               <Settings className="w-4 h-4 sm:w-5 sm:h-5 relative z-10" />
-              <span className="relative z-10 text-sm sm:text-base">Settings</span>
+              <span className="relative z-10 text-sm sm:text-base">
+                Settings
+              </span>
             </button>
           </div>
 
@@ -674,7 +705,13 @@ const DotsAndBoxes_copy2 = () => {
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-indigo-600/20 rounded-3xl blur-xl"></div>
                 <div className="relative">
                   <div className="text-6xl mb-4">
-                    {score.R > score.B ? "🎉" : score.B > score.R ? (gameMode === "pvc" ? "🤖" : "🎉") : "🤝"}
+                    {score.R > score.B
+                      ? "🎉"
+                      : score.B > score.R
+                      ? gameMode === "pvc"
+                        ? "🤖"
+                        : "🎉"
+                      : "🤝"}
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
                     {gameStatus}

@@ -12,7 +12,7 @@ import MemoryMatching from "./games/MemoryMatching";
 import TicTacToe from "./games/TicTacToe";
 import MazeGame from "./games/MazeGame";
 import BrickBreaker from "./games/BrickBreaker";
-import DotsAndBoxes from "./games/DotsAndBoxes";
+import DotsAndBoxes from "./games/DotsAndBoxesGame";
 
 const App = () => {
   return (
