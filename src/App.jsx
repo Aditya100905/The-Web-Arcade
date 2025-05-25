@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./pages/Navbar";
 import Home from "./pages/Home";
@@ -13,11 +13,31 @@ import TicTacToe from "./games/TicTacToe";
 import BrickBreaker from "./games/BrickBreaker";
 import DotsAndBoxes from "./games/DotsAndBoxesGame";
 import FlappyBrid from "./games/FlappyBird";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
+  const location = useLocation();
+  
+  // Define routes where navbar should be shown
+  const navbarRoutes = [
+    "/",
+    "/about",
+    "/game2048",
+    "/rock-paper-scissor",
+    "/sudoku",
+    "/memory-matching",
+    "/tic-tac-toe",
+    "/brick-breaker",
+    "/dots-boxes",
+    "/flappy-bird"
+  ];
+  
+  // Check if current route should show navbar
+  const shouldShowNavbar = navbarRoutes.includes(location.pathname);
+
   return (
     <>
-      <Navbar />
+      {shouldShowNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -29,6 +49,9 @@ const App = () => {
         <Route path="/brick-breaker" element={<BrickBreaker />} />
         <Route path="/dots-boxes" element={<DotsAndBoxes />} />
         <Route path="/flappy-bird" element={<FlappyBrid />} />
+
+        {/* Catch-all route for unmatched paths */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

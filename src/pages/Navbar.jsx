@@ -1,29 +1,40 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Gamepad2, ChevronDown, Menu, X } from "lucide-react";
+import { Gamepad2, ChevronDown, Menu, X, Home, Info, Sparkles } from "lucide-react";
 
 const games = [
-  { name: "2048", path: "/game2048" },
-  { name: "Rock Paper Scissors", path: "/rock-paper-scissor" },
-  { name: "Sudoku", path: "/sudoku" },
-  { name: "Memory Matching", path: "/memory-matching" },
-  { name: "Tic Tac Toe", path: "/tic-tac-toe" },
-  { name: "Flappy Bird", path: "/flappy-bird" },
-  { name: "Brick Breaker", path: "/brick-breaker" },
-  { name: "Dots & Boxes", path: "/dots-boxes" },
+  { name: "2048", path: "/game2048", icon: "🎯" },
+  { name: "Rock Paper Scissors", path: "/rock-paper-scissor", icon: "✂️" },
+  { name: "Sudoku", path: "/sudoku", icon: "🔢" },
+  { name: "Memory Matching", path: "/memory-matching", icon: "🧠" },
+  { name: "Tic Tac Toe", path: "/tic-tac-toe", icon: "⭕" },
+  { name: "Flappy Bird", path: "/flappy-bird", icon: "🐦" },
+  { name: "Brick Breaker", path: "/brick-breaker", icon: "🧱" },
+  { name: "Dots & Boxes", path: "/dots-boxes", icon: "📦" },
 ];
+
 
 const Navbar = () => {
   const location = useLocation();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [gamesDropdownOpen, setGamesDropdownOpen] = useState(false);
-  const [mobileGamesDropdownOpen, setMobileGamesDropdownOpen] = useState(false); // Controlled mobile dropdown state
+  const [mobileGamesDropdownOpen, setMobileGamesDropdownOpen] = useState(false);
   const [announceMessage, setAnnounceMessage] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const dropdownRef = useRef(null);
   const gamesButtonRef = useRef(null);
   const mobileMenuRef = useRef(null);
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Close dropdown & mobile menu on outside click
   const handleClickOutside = useCallback(
@@ -82,6 +93,9 @@ const Navbar = () => {
     } else {
       document.body.style.overflow = "";
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileMenuOpen]);
 
   // Announce menu open/close for screen readers
@@ -100,10 +114,12 @@ const Navbar = () => {
   const activeLinkClass = useCallback(
     (path) =>
       location.pathname === path
-        ? "text-cyan-400 font-semibold"
-        : "hover:text-cyan-400 transition-colors duration-150",
+        ? "text-cyan-400 font-semibold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-cyan-400 after:rounded-full"
+        : "hover:text-cyan-400 transition-colors duration-200 relative group",
     [location.pathname]
   );
+
+  const isActiveGame = games.some(game => game.path === location.pathname);
 
   return (
     <>
@@ -118,234 +134,305 @@ const Navbar = () => {
       </div>
 
       <nav
-        className="bg-slate-900 text-white shadow-md sticky top-0 z-50 select-none"
+        className={`bg-slate-900/95 backdrop-blur-md text-white shadow-lg sticky top-0 z-50 select-none transition-all duration-300 ${
+          isScrolled ? "py-2 shadow-xl border-b border-slate-700/50" : "py-3"
+        }`}
         role="navigation"
         aria-label="Primary navigation"
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          {/* Logo */}
-
-          {/* <Link
-            to="/"
-            className="flex items-center gap-2 text-2xl font-bold hover:text-cyan-400 transition-colors duration-200"
-            aria-label="Go to homepage"
-          >
-            <Gamepad2 className="text-cyan-400" />
-            The Web Arcade
-          </Link> */}
-
-          <Link
-            to="/"
-            className="flex items-center gap-4 text-3xl font-bold hover:text-cyan-400 transition-colors duration-200"
-            aria-label="Go to homepage"
-          >
-            <img
-              src="/logo.png"
-              alt="The Web Arcade Logo"
-              className="w-14 h-14 hover:scale-110 transition-transform rounded-full border-2 border-white shadow-lg object-cover"
-            />
-            The Web Arcade
-          </Link>
-
-          {/* Desktop Menu */}
-          <ul className="hidden md:flex items-center gap-8 text-xl font-medium">
-            <li>
-              <Link to="/" className={activeLinkClass("/")}>
-                Home
-              </Link>
-            </li>
-
-            {/* Games Dropdown */}
-            <li className="relative" ref={dropdownRef}>
-              <button
-                ref={gamesButtonRef}
-                onClick={() => setGamesDropdownOpen((o) => !o)}
-                aria-haspopup="true"
-                aria-expanded={gamesDropdownOpen}
-                aria-controls="games-menu"
-                className={`flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded transition-colors duration-150 ${
-                  gamesDropdownOpen
-                    ? "text-cyan-400 font-semibold"
-                    : "hover:text-cyan-400"
-                }`}
-              >
-                Games{" "}
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-300 ease-in-out ${
-                    gamesDropdownOpen ? "rotate-180" : "rotate-0"
-                  }`}
-                  aria-hidden="true"
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <Link
+              to="/"
+              className="flex items-center gap-3 text-2xl sm:text-3xl font-bold hover:text-cyan-400 transition-all duration-300 group"
+              aria-label="Go to homepage"
+            >
+              <div className="relative">
+                <img
+                  src="/logo.png"
+                  alt="The Web Arcade Logo"
+                  className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 hover:scale-110 transition-transform duration-300 rounded-full border-2 border-white/50 group-hover:border-cyan-400 shadow-lg object-cover"
                 />
-              </button>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse opacity-80"></div>
+              </div>
+              <span className="hidden sm:block bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+                The Web Arcade
+              </span>
+              <span className="sm:hidden text-lg">TWA</span>
+            </Link>
 
-              {/* Dropdown menu */}
-              <ul
-                id="games-menu"
-                role="menu"
-                aria-label="Games submenu"
-                className={`absolute top-full mt-2 w-48 bg-slate-800 rounded-md shadow-lg overflow-hidden transition-opacity duration-200 ease-in-out ${
-                  gamesDropdownOpen
-                    ? "opacity-100 visible"
-                    : "opacity-0 invisible pointer-events-none"
-                }`}
-              >
-                {games.map(({ name, path }) => (
-                  <li key={name} role="none">
-                    <Link
-                      to={path}
-                      className={`block px-4 py-2 text-sm text-white hover:bg-slate-700 focus:bg-slate-700 focus:outline-none ${
-                        location.pathname === path
-                          ? "bg-slate-700 text-cyan-400 font-semibold"
-                          : ""
-                      }`}
-                      role="menuitem"
-                      tabIndex={gamesDropdownOpen ? 0 : -1}
-                      onClick={() => setGamesDropdownOpen(false)}
-                    >
-                      {name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
+            {/* Desktop Menu */}
+            <ul className="hidden lg:flex items-center gap-8 text-lg font-medium">
+              <li>
+                <Link 
+                  to="/" 
+                  className={`${activeLinkClass("/")} flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/50`}
+                >
+                  <Home className="w-4 h-4" />
+                  Home
+                  {location.pathname !== "/" && (
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300 rounded-full"></span>
+                  )}
+                </Link>
+              </li>
 
-            <li>
-              <Link to="/about" className={activeLinkClass("/about")}>
-                About Us
-              </Link>
-            </li>
-          </ul>
+              {/* Games Dropdown */}
+              <li className="relative" ref={dropdownRef}>
+                <button
+                  ref={gamesButtonRef}
+                  onClick={() => setGamesDropdownOpen((o) => !o)}
+                  aria-haspopup="true"
+                  aria-expanded={gamesDropdownOpen}
+                  aria-controls="games-menu"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-200 hover:bg-slate-800/50 ${
+                    gamesDropdownOpen || isActiveGame
+                      ? "text-cyan-400 font-semibold bg-slate-800/30"
+                      : "hover:text-cyan-400"
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Games
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-300 ease-in-out ${
+                      gamesDropdownOpen ? "rotate-180" : "rotate-0"
+                    }`}
+                    aria-hidden="true"
+                  />
+                </button>
 
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => {
-              setMobileMenuOpen((open) => !open);
-              if (mobileMenuOpen) setMobileGamesDropdownOpen(false);
-            }}
-            className="md:hidden focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded"
-            aria-label={
-              mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"
-            }
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+                {/* Dropdown menu */}
+                <ul
+                  id="games-menu"
+                  role="menu"
+                  aria-label="Games submenu"
+                  className={`absolute top-full mt-2 w-64 bg-slate-800/95 backdrop-blur-md rounded-xl shadow-2xl border border-slate-700/50 overflow-hidden transition-all duration-300 ease-out ${
+                    gamesDropdownOpen
+                      ? "opacity-100 visible transform translate-y-0"
+                      : "opacity-0 invisible pointer-events-none transform -translate-y-2"
+                  }`}
+                >
+                  {games.map(({ name, path, icon }, index) => (
+                    <li key={name} role="none">
+                      <Link
+                        to={path}
+                        className={`flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-slate-700/50 focus:bg-slate-700/50 focus:outline-none transition-all duration-200 ${
+                          location.pathname === path
+                            ? "bg-slate-700/70 text-cyan-400 font-semibold border-r-2 border-cyan-400"
+                            : "hover:translate-x-1"
+                        }`}
+                        role="menuitem"
+                        tabIndex={gamesDropdownOpen ? 0 : -1}
+                        onClick={() => setGamesDropdownOpen(false)}
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <span className="text-lg">{icon}</span>
+                        {name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+
+              <li>
+                <Link 
+                  to="/about" 
+                  className={`${activeLinkClass("/about")} flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/50`}
+                >
+                  <Info className="w-4 h-4" />
+                  About Us
+                  {location.pathname !== "/about" && (
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300 rounded-full"></span>
+                  )}
+                </Link>
+              </li>
+            </ul>
+
+            {/* Mobile & Tablet Menu Toggle */}
+            <button
+              onClick={() => {
+                setMobileMenuOpen((open) => !open);
+                if (mobileMenuOpen) setMobileGamesDropdownOpen(false);
+              }}
+              className="lg:hidden focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded-lg p-2 hover:bg-slate-800/50 transition-colors duration-200"
+              aria-label={
+                mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"
+              }
+              aria-expanded={mobileMenuOpen}
+            >
+              <div className="relative w-6 h-6">
+                <Menu 
+                  className={`absolute inset-0 w-6 h-6 transition-all duration-300 ${
+                    mobileMenuOpen ? "opacity-0 rotate-180" : "opacity-100 rotate-0"
+                  }`} 
+                />
+                <X 
+                  className={`absolute inset-0 w-6 h-6 transition-all duration-300 ${
+                    mobileMenuOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-180"
+                  }`} 
+                />
+              </div>
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Blur and dark overlay for mobile menu */}
       <div
         aria-hidden={!mobileMenuOpen}
-        className={`fixed inset-0 z-40 transition-opacity duration-300 ease-in-out pointer-events-none ${
-          mobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0"
+        className={`fixed inset-0 z-40 transition-all duration-300 ease-in-out ${
+          mobileMenuOpen 
+            ? "opacity-100 pointer-events-auto backdrop-blur-sm bg-black/30" 
+            : "opacity-0 pointer-events-none"
         }`}
-        style={{
-          backdropFilter: mobileMenuOpen ? "blur(8px)" : "none",
-          WebkitBackdropFilter: mobileMenuOpen ? "blur(8px)" : "none",
-          backgroundColor: mobileMenuOpen ? "rgba(0,0,0,0.3)" : "transparent",
-          transitionProperty: "opacity, backdrop-filter, background-color",
-        }}
         onClick={() => {
           setMobileMenuOpen(false);
           setMobileGamesDropdownOpen(false);
         }}
-      ></div>
+      />
 
       {/* Mobile Menu */}
       <nav
         ref={mobileMenuRef}
-        className={`fixed top-0 left-0 z-50 w-72 max-w-full h-full bg-slate-900 shadow-xl p-8 flex flex-col gap-8 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-50 w-80 sm:w-96 max-w-[90vw] h-full bg-slate-900/98 backdrop-blur-md shadow-2xl border-r border-slate-700/50 flex flex-col transform transition-all duration-300 ease-out ${
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         role="menu"
         aria-label="Mobile primary navigation"
       >
-        <Link
-          to="/"
-          className={`block text-lg font-medium px-2 py-2 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-colors ${
-            location.pathname === "/"
-              ? "text-cyan-400 font-semibold"
-              : "text-white hover:text-cyan-400"
-          }`}
-          onClick={() => setMobileMenuOpen(false)}
-          role="menuitem"
-          tabIndex={mobileMenuOpen ? 0 : -1}
-        >
-          Home
-        </Link>
-
-        {/* Games submenu for mobile */}
-        <div>
-          <button
-            onClick={() => setMobileGamesDropdownOpen((o) => !o)}
-            aria-haspopup="true"
-            aria-expanded={mobileGamesDropdownOpen}
-            aria-controls="mobile-games-menu"
-            className={`flex items-center justify-between w-full px-2 py-2 font-semibold text-lg rounded focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-colors ${
-              mobileGamesDropdownOpen
-                ? "text-cyan-400"
-                : "text-white hover:text-cyan-400"
-            }`}
+        {/* Mobile Menu Header */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          <Link
+            to="/"
+            className="flex items-center gap-3 text-xl font-bold text-cyan-400"
+            onClick={() => setMobileMenuOpen(false)}
           >
-            Games
-            <ChevronDown
-              className={`w-5 h-5 transition-transform duration-300 ease-in-out ${
-                mobileGamesDropdownOpen ? "rotate-180" : "rotate-0"
-              }`}
-              aria-hidden="true"
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-8 h-8 rounded-full border border-cyan-400/30"
             />
-          </button>
-          <ul
-            id="mobile-games-menu"
-            role="menu"
-            aria-label="Mobile Games submenu"
-            className={`mt-2 pl-4 flex flex-col gap-2 overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
-              mobileGamesDropdownOpen
-                ? "max-h-96 opacity-100"
-                : "max-h-0 opacity-0 pointer-events-none"
-            }`}
-          >
-            {games.map(({ name, path }) => (
-              <li key={name}>
-                <Link
-                  to={path}
-                  className={`block px-2 py-1 rounded text-base font-medium focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-colors ${
-                    location.pathname === path
-                      ? "text-cyan-400 font-semibold"
-                      : "text-white hover:text-cyan-400"
-                  }`}
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setMobileGamesDropdownOpen(false);
-                  }}
-                  role="menuitem"
-                  tabIndex={mobileMenuOpen && mobileGamesDropdownOpen ? 0 : -1}
-                >
-                  {name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+            The Web Arcade
+          </Link>
         </div>
 
-        <Link
-          to="/about"
-          className={`block text-lg font-medium px-2 py-2 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-colors ${
-            location.pathname === "/about"
-              ? "text-cyan-400 font-semibold"
-              : "text-white hover:text-cyan-400"
-          }`}
-          onClick={() => setMobileMenuOpen(false)}
-          role="menuitem"
-          tabIndex={mobileMenuOpen ? 0 : -1}
-        >
-          About Us
-        </Link>
+        {/* Mobile Menu Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-2">
+          <Link
+            to="/"
+            className={`flex items-center gap-3 text-lg font-medium px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-200 ${
+              location.pathname === "/"
+                ? "text-cyan-400 font-semibold bg-slate-800/50 border-l-4 border-cyan-400"
+                : "text-white hover:text-cyan-400 hover:bg-slate-800/30"
+            }`}
+            onClick={() => setMobileMenuOpen(false)}
+            role="menuitem"
+            tabIndex={mobileMenuOpen ? 0 : -1}
+          >
+            <Home className="w-5 h-5" />
+            Home
+          </Link>
+
+          {/* Games submenu for mobile */}
+          <div>
+            <button
+              onClick={() => setMobileGamesDropdownOpen((o) => !o)}
+              aria-haspopup="true"
+              aria-expanded={mobileGamesDropdownOpen}
+              aria-controls="mobile-games-menu"
+              className={`flex items-center justify-between w-full px-4 py-3 font-medium text-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-200 ${
+                mobileGamesDropdownOpen || isActiveGame
+                  ? "text-cyan-400 bg-slate-800/50"
+                  : "text-white hover:text-cyan-400 hover:bg-slate-800/30"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5" />
+                Games
+              </div>
+              <ChevronDown
+                className={`w-5 h-5 transition-transform duration-300 ease-in-out ${
+                  mobileGamesDropdownOpen ? "rotate-180" : "rotate-0"
+                }`}
+                aria-hidden="true"
+              />
+            </button>
+            
+            <ul
+              id="mobile-games-menu"
+              role="menu"
+              aria-label="Mobile Games submenu"
+              className={`mt-2 ml-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${
+                mobileGamesDropdownOpen
+                  ? "max-h-96 opacity-100"
+                  : "max-h-0 opacity-0 pointer-events-none"
+              }`}
+            >
+              {games.map(({ name, path, icon }, index) => (
+                <li key={name}>
+                  <Link
+                    to={path}
+                    className={`flex items-center gap-3 px-4 py-2 rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-200 ${
+                      location.pathname === path
+                        ? "text-cyan-400 font-semibold bg-slate-800/30 border-l-2 border-cyan-400"
+                        : "text-white hover:text-cyan-400 hover:bg-slate-800/20"
+                    }`}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setMobileGamesDropdownOpen(false);
+                    }}
+                    role="menuitem"
+                    tabIndex={mobileMenuOpen && mobileGamesDropdownOpen ? 0 : -1}
+                    style={{ 
+                      animationDelay: `${index * 50}ms`,
+                      animation: mobileGamesDropdownOpen ? 'slideInLeft 0.3s ease-out forwards' : 'none'
+                    }}
+                  >
+                    <span className="text-lg">{icon}</span>
+                    {name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <Link
+            to="/about"
+            className={`flex items-center gap-3 text-lg font-medium px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-200 ${
+              location.pathname === "/about"
+                ? "text-cyan-400 font-semibold bg-slate-800/50 border-l-4 border-cyan-400"
+                : "text-white hover:text-cyan-400 hover:bg-slate-800/30"
+            }`}
+            onClick={() => setMobileMenuOpen(false)}
+            role="menuitem"
+            tabIndex={mobileMenuOpen ? 0 : -1}
+          >
+            <Info className="w-5 h-5" />
+            About Us
+          </Link>
+        </div>
+
+        {/* Mobile Menu Footer */}
+        <div className="p-6 border-t border-slate-700/50">
+          <div className="text-center text-sm text-slate-400">
+            <p>© 2024 The Web Arcade</p>
+            <p className="text-xs mt-1">Play • Explore • Enjoy</p>
+          </div>
+        </div>
       </nav>
+
+      <style jsx>{`
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </>
   );
 };
