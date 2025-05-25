@@ -464,10 +464,21 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center hover:scale-110 transition-transform justify-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-full border-2 border-white shadow-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Gamepad2 className="w-8 h-8 text-white" />
+              
+              
+
+              <div className="relative">
+                <img
+                  src="/logo.png"
+                  alt="The Web Arcade Logo"
+                  className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 scale-120 transition-transform duration-300 rounded-full border-2 border-white/50 object-cover"
+                />
               </div>
-              <span className="text-xl font-bold">The Web Arcade</span>
+              <span className="hidden sm:block text-xl bg-gradient-to-r from-cyan-300 via-purple-300 to-violet-400 bg-clip-text text-transparent">
+                The Web Arcade
+              </span>
+
+
             </div>
             <p className="text-gray-400 text-sm">
               Built with{" "}
