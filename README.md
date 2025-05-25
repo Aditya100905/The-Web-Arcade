@@ -1,12 +1,39 @@
-# React + Vite
+# The Web Arcade
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Welcome to The Web Arcade** — a collection of classic and modern games reimagined for the web. Play, compete, and conquer across various categories like Puzzle, Classic, Logic, Memory, Strategy, and Arcade.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Diverse Game Collection**: Enjoy games such as 2048, Rock Paper Scissors, Sudoku, Memory Matching, Tic Tac Toe, Flappy Bird, Brick Breaker, and Dots & Boxes.
+- **Category Filtering**: Easily filter games by category.
+- **Interactive UI**: Hover over games to see animated previews and play instantly.
+- **Responsive Design**: Smooth experience across devices.
+- **Modern Animations**: Background and UI animations for an immersive experience.
 
-## Expanding the ESLint configuration
+## Available Games
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 2048 (Puzzle, Medium)
+- Rock Paper Scissors (Classic, Easy)
+- Sudoku (Logic, Hard)
+- Memory Matching (Memory, Easy)
+- Tic Tac Toe (Strategy, Easy)
+- Flappy Bird (Arcade, Hard)
+- Brick Breaker (Arcade, Medium)
+- Dots & Boxes (Strategy, Medium)
+
+## Getting Started
+
+To run the project locally, follow these steps:
+
+```bash
+# Clone the repository
+git clone <repository-url>
+
+# Navigate into the project directory
+cd <project-directory>
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
