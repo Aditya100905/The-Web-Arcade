@@ -3,3 +3,25 @@
 button {
   cursor: pointer;
 }
+
+/* index.css */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(90, 42, 152);
+  backdrop-filter: blur(2px);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(40, 21, 65);
+  backdrop-filter: blur(2px);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(38, 14, 69);
+  cursor: grab;
+}

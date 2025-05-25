@@ -147,7 +147,6 @@ export default function Home() {
   const titleRef = useRef(null);
   const typewriterRef = useRef(null);
 
-
   const categories = [
     "All",
     "Puzzle",

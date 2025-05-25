@@ -1,11 +1,10 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export default function NotFound() {
   const navigate = useNavigate();
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white flex items-center justify-center px-6 py-12">
-
       {/* Decorative Bubbles (Blurred Circles) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         {/* Large bubbles */}
@@ -35,7 +34,7 @@ export default function NotFound() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
-            onClick={() => navigate('/', { replace: true })}
+            onClick={() => navigate("/", { replace: true })}
             className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700 transition-all duration-300 font-medium shadow-lg transform hover:scale-105"
           >
             Back to Home
