@@ -27,10 +27,10 @@ To run the project locally, follow these steps:
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Aditya100905/The-Web-Arcade.git
 
 # Navigate into the project directory
-cd <project-directory>
+cd theWebArcade
 
 # Install dependencies
 npm install
