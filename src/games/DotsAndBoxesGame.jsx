@@ -358,7 +358,7 @@ const DotsAndBoxesGame = () => {
 
           <div className="space-y-8">
             <div className="bg-gradient-to-r from-white/10 via-white/5 to-transparent rounded-2xl p-6 border border-white/20 backdrop-blur-sm">
-              <label className="block text-cyan-100 font-semibold mb-6 flex items-center gap-3 text-lg">
+              <label className="block text-cyan-100 font-semibold mb-6 sm:flex items-center gap-3 text-lg">
                 <Sparkles className="w-6 h-6 text-cyan-400" />
                 Grid Size
               </label>

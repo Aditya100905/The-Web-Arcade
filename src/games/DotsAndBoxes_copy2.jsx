@@ -15,7 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const DotsAndBoxesGame = () => {
+const DotsAndBoxes_copy2 = () => {
   const [gridSize, setGridSize] = useState(4);
   const [gameMode, setGameMode] = useState("menu");
   const [turn, setTurn] = useState("R");
@@ -327,7 +327,7 @@ const DotsAndBoxesGame = () => {
           </div>
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-white/10 via-white/5 to-transparent rounded-2xl p-6 border border-white/20 backdrop-blur-sm">
-              <label className="block text-cyan-100 font-semibold mb-4 flex items-center gap-2">
+              <label className="block text-cyan-100 font-semibold mb-4 sm:flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-cyan-400" />
                 Grid Size
               </label>
@@ -464,7 +464,7 @@ const DotsAndBoxesGame = () => {
             <div className="relative group order-2 xl:order-1">
               <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
               <div className="relative bg-gradient-to-r from-white/10 via-white/5 to-transparent backdrop-blur-xl rounded-2xl px-4 sm:px-6 py-3 sm:py-4 border border-white/20 shadow-xl">
-                <p className="text-white text-sm sm:text-lg font-bold text-center bg-gradient-to-r from-cyan-100 via-blue-100 to-indigo-100 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                <p className="text-white text-sm sm:text-lg font-bold text-center bg-gradient-to-r from-cyan-100 via-blue-100 to-indigo-100 bg-clip-text sm:text-transparent flex items-center justify-center gap-2">
                   {isComputerThinking && (
                     <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
                   )}
@@ -721,4 +721,4 @@ const DotsAndBoxesGame = () => {
   );
 };
 
-export default DotsAndBoxesGame;
+export default DotsAndBoxes_copy2;
