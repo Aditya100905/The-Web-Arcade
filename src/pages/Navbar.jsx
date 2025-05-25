@@ -11,6 +11,9 @@ const games = [
   { name: "Maze Game", path: "/maze-game" },
   { name: "Brick Breaker", path: "/brick-breaker" },
   { name: "Dots & Boxes", path: "/dots-boxes" },
+  { name: "Flappy Bird", path: "/flappy-bird" },
+  { name: "Minesweeper", path: "/minesweeper" },
+  { name: "Snake & Ladder", path: "/snake-ladder" },
 ];
 
 const Navbar = () => {
@@ -148,7 +151,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Menu */}
-          <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <ul className="hidden md:flex items-center gap-8 text-xl font-medium">
             <li>
               <Link to="/" className={activeLinkClass("/")}>
                 Home
