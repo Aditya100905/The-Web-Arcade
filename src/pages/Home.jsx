@@ -477,6 +477,7 @@ export default function Home() {
               <span className="hidden sm:block text-xl bg-gradient-to-r from-cyan-300 via-purple-300 to-violet-400 bg-clip-text text-transparent">
                 The Web Arcade
               </span>
+              <span className="sm:hidden text-lg">TWA</span>
 
 
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Gamepad2, ChevronDown, Menu, X, Home, Info, Sparkles } from "lucide-react";
+import { ChevronDown, Menu, X, Home, Info, Sparkles } from "lucide-react";
 
 const games = [
   { name: "2048", path: "/game2048", icon: "🎯" },
@@ -154,7 +154,6 @@ const Navbar = () => {
                   alt="The Web Arcade Logo"
                   className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 hover:scale-110 transition-transform duration-300 rounded-full border-2 border-white/50 group-hover:border-cyan-400 shadow-lg object-cover"
                 />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse opacity-80"></div>
               </div>
               <span className="hidden sm:block bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
                 The Web Arcade
@@ -415,7 +414,7 @@ const Navbar = () => {
         {/* Mobile Menu Footer */}
         <div className="p-6 border-t border-slate-700/50">
           <div className="text-center text-sm text-slate-400">
-            <p>© 2024 The Web Arcade</p>
+            <p>© {new Date().getFullYear()} The Web Arcade</p>
             <p className="text-xs mt-1">Play • Explore • Enjoy</p>
           </div>
         </div>
