@@ -143,7 +143,7 @@ export default function Home() {
       typewriterRef.current = new TxtType(
         titleRef.current,
         [
-          "WELCOME TO WEB ARCADE",
+          "WELCOME TO THE WEB ARCADE",
           "PLAY • COMPETE • CONQUER",
           "ENDLESS GAMING AWAITS",
         ],
@@ -184,7 +184,8 @@ export default function Home() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-4 py-6">
+
+      {/* <header className="relative z-10 px-4 py-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-transform duration-300">
             <div className="p-3 bg-gradient-to-br from-cyan-500 via-purple-600 to-pink-600 rounded-xl shadow-lg shadow-purple-500/25">
@@ -200,7 +201,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* Hero Section */}
       <section className="relative z-10 text-center py-12 px-4">
