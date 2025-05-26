@@ -247,10 +247,10 @@ const SudokuGame = () => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [gameState.selectedCell, gameState.isComplete]);
 
-  // Get cell classes with consistent styling
+  // Get cell classes with consistent styling - improved for mobile
   const getCellClasses = (row, col) => {
     let classes =
-      "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center text-base sm:text-lg md:text-xl font-bold cursor-pointer transition-all duration-200 select-none ";
+      "w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center text-sm xs:text-base sm:text-lg md:text-xl font-bold cursor-pointer transition-all duration-200 select-none ";
 
     // Original puzzle cells (read-only)
     if (gameState.originalPuzzle[row][col] !== 0) {
@@ -280,14 +280,14 @@ const SudokuGame = () => {
     return classes;
   };
 
-  // Get consistent 3x3 box styling
+  // Get consistent 3x3 box styling - improved for mobile
   const getBoxClasses = (boxRow, boxCol) => {
-    return `bg-gradient-to-br from-slate-900/60 via-black/80 to-slate-900/60 p-1 rounded-lg border border-emerald-500/40`;
+    return `bg-gradient-to-br from-slate-900/60 via-black/80 to-slate-900/60 p-0.5 sm:p-1 rounded-md sm:rounded-lg border border-emerald-500/40`;
   };
 
   const getDifficultyButtonClasses = (difficulty) => {
     const isActive = gameState.difficulty === difficulty;
-    return `px-4 py-2 sm:px-6 sm:py-3 font-bold text-sm sm:text-base rounded-lg transition-all duration-300 transform ${
+    return `px-3 py-2 xs:px-4 xs:py-2 sm:px-6 sm:py-3 font-bold text-xs xs:text-sm sm:text-base rounded-lg transition-all duration-300 transform ${
       isActive
         ? "bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white shadow-lg shadow-emerald-500/30 scale-105"
         : "bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 text-emerald-300 hover:from-emerald-900/50 hover:via-teal-900/50 hover:to-cyan-900/50 hover:text-white hover:scale-105"
@@ -296,47 +296,47 @@ const SudokuGame = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white overflow-x-hidden">
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-2 xs:px-4 py-4 xs:py-6 max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-2xl">
+        <div className="text-center mb-4 xs:mb-6 sm:mb-8">
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black mb-2 xs:mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-2xl">
             SUDOKU
           </h1>
-          <p className="text-base sm:text-lg text-emerald-300/80 font-light tracking-wide">
+          <p className="text-sm xs:text-base sm:text-lg text-emerald-300/80 font-light tracking-wide px-4">
             Master the Ultimate Number Challenge
           </p>
         </div>
 
-        {/* Timer Display */}
-        <div className="flex justify-center items-center gap-6 mb-8">
-          <div className="bg-gradient-to-br from-slate-800/80 via-slate-900/90 to-black/80 p-4 sm:p-6 rounded-xl shadow-xl border border-emerald-500/30">
+        {/* Timer Display - responsive layout */}
+        <div className="flex flex-col xs:flex-row justify-center mx-auto max-w-sm items-center gap-3 xs:gap-6 mb-4 xs:mb-6 sm:mb-8 px-2">
+          <div className="bg-gradient-to-br from-slate-800/80 via-slate-900/90 to-black/80 p-3 xs:p-4 sm:p-6 rounded-xl shadow-xl border border-emerald-500/30 w-full xs:w-auto">
             <div className="text-xs sm:text-sm text-emerald-400 mb-2 font-semibold tracking-wider uppercase text-center">
               Current Time
             </div>
-            <div className="text-2xl sm:text-3xl font-mono font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent text-center">
+            <div className="text-xl xs:text-2xl sm:text-3xl font-mono font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent text-center">
               {formatTime(timer)}
             </div>
           </div>
 
           {minTime > 0 && (
-            <div className="bg-gradient-to-br from-slate-800/80 via-slate-900/90 to-black/80 p-4 sm:p-6 rounded-xl shadow-xl border border-yellow-500/30">
+            <div className="bg-gradient-to-br from-slate-800/80 via-slate-900/90 to-black/80 p-3 xs:p-4 sm:p-6 rounded-xl shadow-xl border border-yellow-500/30 w-full xs:w-auto">
               <div className="text-xs sm:text-sm text-yellow-400 mb-2 font-semibold tracking-wider uppercase text-center">
                 Best Time
               </div>
-              <div className="text-2xl sm:text-3xl font-mono font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent text-center">
+              <div className="text-xl xs:text-2xl sm:text-3xl font-mono font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent text-center">
                 {formatTime(minTime)}
               </div>
             </div>
           )}
         </div>
 
-        {/* Game Controls */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-gradient-to-br from-slate-800/50 via-slate-900/60 to-black/50 p-4 sm:p-6 rounded-xl shadow-xl border border-emerald-500/20">
-            <h3 className="text-base sm:text-lg font-semibold text-emerald-400 tracking-wide text-center mb-4">
+        {/* Game Controls - responsive layout */}
+        <div className="flex justify-center mb-4 xs:mb-6 sm:mb-8 px-2">
+          <div className="bg-gradient-to-br from-slate-800/50 via-slate-900/60 to-black/50 p-3 xs:p-4 sm:p-6 rounded-xl shadow-xl border border-emerald-500/20 w-full max-w-md">
+            <h3 className="text-sm xs:text-base sm:text-lg font-semibold text-emerald-400 tracking-wide text-center mb-3 xs:mb-4">
               Select Difficulty
             </h3>
-            <div className="flex gap-3">
+            <div className="flex gap-2 xs:gap-3 justify-center">
               <button
                 onClick={() => startNewGame("easy")}
                 className={getDifficultyButtonClasses("easy")}
@@ -359,10 +359,10 @@ const SudokuGame = () => {
           </div>
         </div>
 
-        {/* Game Board with 3x3 Box Layout */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-gradient-to-br from-slate-900/80 via-black/90 to-slate-900/80 p-4 sm:p-6 rounded-2xl shadow-2xl border-2 border-emerald-500/30">
-            <div className="grid grid-cols-3 gap-2 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 p-3 rounded-xl">
+        {/* Game Board with 3x3 Box Layout - optimized for mobile */}
+        <div className="flex justify-center mb-4 xs:mb-6 sm:mb-8 px-1">
+          <div className="bg-gradient-to-br from-slate-900/80 via-black/90 to-slate-900/80 p-2 xs:p-3 sm:p-4 md:p-6 rounded-xl xs:rounded-2xl shadow-2xl border-2 border-emerald-500/30 w-full max-w-md xs:max-w-lg sm:max-w-xl md:max-w-2xl">
+            <div className="grid grid-cols-3 gap-1 xs:gap-1.5 sm:gap-2 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 p-2 xs:p-3 rounded-lg xs:rounded-xl">
               {Array(3)
                 .fill()
                 .map((_, boxRow) =>
@@ -403,18 +403,18 @@ const SudokuGame = () => {
           </div>
         </div>
 
-        {/* Number Input */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-gradient-to-br from-slate-800/50 via-slate-900/60 to-black/50 p-4 sm:p-6 rounded-xl shadow-xl border border-emerald-500/20">
-            <h3 className="text-base sm:text-lg font-semibold text-emerald-400 tracking-wide text-center mb-4">
+        {/* Number Input - responsive grid */}
+        <div className="flex justify-center mb-4 xs:mb-6 sm:mb-8 px-2">
+          <div className="bg-gradient-to-br from-slate-800/50 via-slate-900/60 to-black/50 p-3 xs:p-4 sm:p-6 rounded-xl shadow-xl border border-emerald-500/20 w-full max-w-md">
+            <h3 className="text-sm xs:text-base sm:text-lg font-semibold text-emerald-400 tracking-wide text-center mb-3 xs:mb-4">
               Number Input
             </h3>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-5 gap-1.5 xs:gap-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                 <button
                   key={num}
                   onClick={() => handleNumberInput(num)}
-                  className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 hover:from-emerald-800/50 hover:via-teal-800/50 hover:to-cyan-800/50 border border-emerald-500/30 rounded-lg text-base sm:text-xl font-bold transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 hover:from-emerald-800/50 hover:via-teal-800/50 hover:to-cyan-800/50 border border-emerald-500/30 rounded-lg text-sm xs:text-base sm:text-xl font-bold transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   disabled={!gameState.selectedCell || gameState.isComplete}
                 >
                   {num}
@@ -422,7 +422,7 @@ const SudokuGame = () => {
               ))}
               <button
                 onClick={() => handleNumberInput(0)}
-                className="bg-gradient-to-br from-red-700 via-red-800 to-red-900 hover:from-red-600 hover:via-red-700 hover:to-red-800 border border-red-500/50 rounded-lg text-sm font-bold transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="bg-gradient-to-br from-red-700 via-red-800 to-red-900 hover:from-red-600 hover:via-red-700 hover:to-red-800 border border-red-500/50 rounded-lg text-xs xs:text-sm font-bold transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 disabled={!gameState.selectedCell || gameState.isComplete}
               >
                 Clear
@@ -433,24 +433,24 @@ const SudokuGame = () => {
 
         {/* Completion Message */}
         {gameState.isComplete && (
-          <div className="flex justify-center mb-8">
-            <div className="bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-cyan-500/20 backdrop-blur-sm border border-emerald-400/50 p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md mx-auto animate-pulse">
+          <div className="flex justify-center mb-4 xs:mb-6 sm:mb-8 px-2">
+            <div className="bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-cyan-500/20 backdrop-blur-sm border border-emerald-400/50 p-4 xs:p-6 sm:p-8 rounded-2xl shadow-2xl max-w-sm xs:max-w-md mx-auto animate-pulse w-full">
               <div className="text-center">
-                <div className="text-5xl sm:text-6xl mb-4">🎉</div>
-                <h2 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                <div className="text-4xl xs:text-5xl sm:text-6xl mb-3 xs:mb-4">🎉</div>
+                <h2 className="text-xl xs:text-2xl sm:text-3xl font-bold mb-3 xs:mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                   Congratulations!
                 </h2>
-                <p className="text-lg sm:text-xl mb-4 text-emerald-300">
+                <p className="text-base xs:text-lg sm:text-xl mb-3 xs:mb-4 text-emerald-300">
                   Puzzle Completed!
                 </p>
-                <div className="bg-slate-900/50 p-4 rounded-xl mb-4">
-                  <p className="font-mono text-xl sm:text-2xl text-cyan-400">
+                <div className="bg-slate-900/50 p-3 xs:p-4 rounded-xl mb-3 xs:mb-4">
+                  <p className="font-mono text-lg xs:text-xl sm:text-2xl text-cyan-400">
                     Time: {formatTime(timer)}
                   </p>
                 </div>
                 {timer === minTime && minTime > 0 && (
                   <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 p-3 rounded-xl">
-                    <p className="text-yellow-300 font-bold text-base sm:text-lg">
+                    <p className="text-yellow-300 font-bold text-sm xs:text-base sm:text-lg">
                       🏆 New Best Time!
                     </p>
                   </div>
@@ -460,13 +460,13 @@ const SudokuGame = () => {
           </div>
         )}
 
-        {/* Instructions */}
-        <div className="text-center">
-          <div className="bg-gradient-to-br from-slate-800/30 via-slate-900/40 to-black/30 p-6 rounded-xl shadow-lg border border-emerald-500/10 max-w-2xl mx-auto">
-            <h4 className="text-base sm:text-lg font-semibold text-emerald-400 mb-3">
+        {/* Instructions - responsive text */}
+        <div className="text-center px-2">
+          <div className="bg-gradient-to-br from-slate-800/30 via-slate-900/40 to-black/30 p-4 xs:p-6 rounded-xl shadow-lg border border-emerald-500/10 max-w-2xl mx-auto">
+            <h4 className="text-sm xs:text-base sm:text-lg font-semibold text-emerald-400 mb-3">
               How to Play
             </h4>
-            <div className="text-sm sm:text-base text-gray-300 space-y-2">
+            <div className="text-xs xs:text-sm sm:text-base text-gray-300 space-y-2">
               <p>• Click on any empty cell to select it</p>
               <p>• Use the number buttons or keyboard (1-9) to fill cells</p>
               <p>• Press Clear button or Backspace to remove numbers</p>
