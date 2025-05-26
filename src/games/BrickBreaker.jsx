@@ -9,6 +9,40 @@ const BrickBreakerGame = () => {
   const [level, setLevel] = useState(1);
   const [highScore, setHighScore] = useState(0);
   const [difficulty, setDifficulty] = useState("medium");
+  const [isMobile, setIsMobile] = useState(false);
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+
+  useEffect(() => {
+    document.title = "Brick Breaker";
+  }, []);
+
+  // Detect mobile and set canvas size
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768 || "ontouchstart" in window;
+      setIsMobile(mobile);
+
+      // Set responsive canvas size
+      const maxWidth = Math.min(window.innerWidth - 32, 800);
+      const maxHeight = Math.min(window.innerHeight * 0.6, 600);
+      const aspectRatio = 800 / 600;
+
+      let width, height;
+      if (maxWidth / aspectRatio <= maxHeight) {
+        width = maxWidth;
+        height = maxWidth / aspectRatio;
+      } else {
+        height = maxHeight;
+        width = maxHeight * aspectRatio;
+      }
+
+      setCanvasSize({ width: Math.floor(width), height: Math.floor(height) });
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Game configuration based on difficulty - reduced speeds for better playability
   const getDifficultyConfig = (diff) => {
@@ -20,10 +54,10 @@ const BrickBreakerGame = () => {
     return configs[diff];
   };
 
-  // Game constants
-  const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 600;
-  const PADDLE_Y = 550;
+  // Dynamic canvas dimensions
+  const CANVAS_WIDTH = canvasSize.width;
+  const CANVAS_HEIGHT = canvasSize.height;
+  const PADDLE_Y = CANVAS_HEIGHT - 50;
 
   // Power-up types
   const POWERUP_TYPES = {
@@ -43,6 +77,8 @@ const BrickBreakerGame = () => {
     keys: {},
     gameStarted: false,
     originalPaddleWidth: 120,
+    touchStartX: null,
+    lastTouchTime: 0,
   });
 
   // Load high score from memory (simulating localStorage)
@@ -55,12 +91,15 @@ const BrickBreakerGame = () => {
   // Initialize high scores on mount
   useEffect(() => {
     const loadHighScores = () => {
-      const stored = localStorage.getItem("brickBreakerHighScores");
-      if (stored) {
-        return JSON.parse(stored);
-      } else {
-        return { easy: 0, medium: 0, hard: 0 };
+      try {
+        const stored = localStorage.getItem("brickBreakerHighScores");
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (error) {
+        console.log("LocalStorage not available, using memory storage");
       }
+      return { easy: 0, medium: 0, hard: 0 };
     };
 
     const scores = loadHighScores();
@@ -72,7 +111,11 @@ const BrickBreakerGame = () => {
   const saveHighScore = useCallback((newScore, diff) => {
     setSavedHighScores((prev) => {
       const updated = { ...prev, [diff]: Math.max(prev[diff], newScore) };
-      localStorage.setItem("brickBreakerHighScores", JSON.stringify(updated));
+      try {
+        localStorage.setItem("brickBreakerHighScores", JSON.stringify(updated));
+      } catch (error) {
+        console.log("LocalStorage not available");
+      }
       return updated;
     });
   }, []);
@@ -94,7 +137,7 @@ const BrickBreakerGame = () => {
       y,
       dx: dx || ballSpeed * (Math.random() > 0.5 ? 1 : -1),
       dy: dy || -ballSpeed,
-      radius: 10,
+      radius: Math.max(8, Math.min(10, CANVAS_WIDTH / 80)), // Responsive ball size
       active: true,
       lastCollision: null, // Track last collision to prevent stuck balls
     };
@@ -131,59 +174,65 @@ const BrickBreakerGame = () => {
   };
 
   // Initialize bricks with randomized layouts and better hit mechanics
-  const initializeBricks = useCallback((level) => {
-    const bricks = [];
-    const rows = Math.min(5 + Math.floor(level / 3), 8); // Slower row increase
-    const cols = 10;
-    const brickWidth = 75;
-    const brickHeight = 25;
-    const padding = 2;
-    const offsetTop = 80;
-    const totalWidth = cols * brickWidth + (cols - 1) * padding;
-    const offsetLeft = (CANVAS_WIDTH - totalWidth) / 2;
+  const initializeBricks = useCallback(
+    (level) => {
+      const bricks = [];
+      const rows = Math.min(4 + Math.floor(level / 3), 7); // Fewer rows on mobile
+      const cols = isMobile ? 8 : 10; // Fewer columns on mobile
+      const brickWidth = Math.floor((CANVAS_WIDTH - 40) / cols) - 2;
+      const brickHeight = Math.max(20, Math.floor(CANVAS_HEIGHT / 30));
+      const padding = 2;
+      const offsetTop = Math.floor(CANVAS_HEIGHT * 0.15);
+      const totalWidth = cols * brickWidth + (cols - 1) * padding;
+      const offsetLeft = (CANVAS_WIDTH - totalWidth) / 2;
 
-    const pattern = generateBrickPattern(level);
+      const pattern = generateBrickPattern(level);
 
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (!pattern(r, c, rows, cols)) continue;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (!pattern(r, c, rows, cols)) continue;
 
-        // More varied hit counts based on position and level
-        let hitCount;
-        if (r < 2)
-          hitCount = Math.min(1 + Math.floor(level / 4), 3); // Top rows harder
-        else if (r < 4) hitCount = Math.min(1 + Math.floor(level / 6), 2);
-        else hitCount = 1;
+          // More varied hit counts based on position and level
+          let hitCount;
+          if (r < 2)
+            hitCount = Math.min(
+              1 + Math.floor(level / 4),
+              3
+            ); // Top rows harder
+          else if (r < 4) hitCount = Math.min(1 + Math.floor(level / 6), 2);
+          else hitCount = 1;
 
-        // Add some randomization
-        if (Math.random() < 0.2) hitCount = Math.min(hitCount + 1, 4);
+          // Add some randomization
+          if (Math.random() < 0.2) hitCount = Math.min(hitCount + 1, 4);
 
-        const maxHits = hitCount;
+          const maxHits = hitCount;
 
-        // Determine brick color based on hits required
-        let color;
-        if (hitCount === 1) color = "#06b6d4"; // cyan
-        else if (hitCount === 2) color = "#3b82f6"; // blue
-        else if (hitCount === 3) color = "#4f46e5"; // indigo
-        else color = "#7c3aed"; // purple
+          // Determine brick color based on hits required
+          let color;
+          if (hitCount === 1) color = "#06b6d4"; // cyan
+          else if (hitCount === 2) color = "#3b82f6"; // blue
+          else if (hitCount === 3) color = "#4f46e5"; // indigo
+          else color = "#7c3aed"; // purple
 
-        bricks.push({
-          x: c * (brickWidth + padding) + offsetLeft,
-          y: r * (brickHeight + padding) + offsetTop,
-          width: brickWidth,
-          height: brickHeight,
-          hits: hitCount,
-          maxHits: maxHits,
-          color: color,
-          visible: true,
-          points: hitCount * 10 + level * 5, // Better scoring
-          hasPowerup: Math.random() < 0.12, // Slightly reduced powerup chance
-          lastHit: 0, // Track when brick was last hit
-        });
+          bricks.push({
+            x: c * (brickWidth + padding) + offsetLeft,
+            y: r * (brickHeight + padding) + offsetTop,
+            width: brickWidth,
+            height: brickHeight,
+            hits: hitCount,
+            maxHits: maxHits,
+            color: color,
+            visible: true,
+            points: hitCount * 10 + level * 5, // Better scoring
+            hasPowerup: Math.random() < 0.12, // Slightly reduced powerup chance
+            lastHit: 0, // Track when brick was last hit
+          });
+        }
       }
-    }
-    return bricks;
-  }, []);
+      return bricks;
+    },
+    [CANVAS_WIDTH, CANVAS_HEIGHT, isMobile]
+  );
 
   // Create powerup
   const createPowerup = (x, y) => {
@@ -192,8 +241,8 @@ const BrickBreakerGame = () => {
     return {
       x,
       y,
-      width: 30,
-      height: 20,
+      width: Math.max(25, Math.floor(CANVAS_WIDTH / 30)),
+      height: Math.max(18, Math.floor(CANVAS_HEIGHT / 35)),
       type,
       dy: 1.5, // Slower falling powerups
       active: true,
@@ -205,10 +254,17 @@ const BrickBreakerGame = () => {
     const game = gameRef.current;
     const config = getDifficultyConfig(difficulty);
 
-    game.paddle.x = CANVAS_WIDTH / 2 - config.paddleWidth / 2;
-    game.paddle.width = config.paddleWidth;
+    // Scale paddle size based on canvas width
+    const scaledPaddleWidth = Math.floor(
+      (config.paddleWidth * CANVAS_WIDTH) / 800
+    );
+
+    game.paddle.x = CANVAS_WIDTH / 2 - scaledPaddleWidth / 2;
+    game.paddle.y = PADDLE_Y;
+    game.paddle.width = scaledPaddleWidth;
+    game.paddle.height = Math.max(12, Math.floor(CANVAS_HEIGHT / 40));
     game.paddle.speed = config.paddleSpeed;
-    game.originalPaddleWidth = config.paddleWidth;
+    game.originalPaddleWidth = scaledPaddleWidth;
 
     game.balls = [createBall()];
     game.bricks = initializeBricks(level);
@@ -216,59 +272,81 @@ const BrickBreakerGame = () => {
     game.gameStarted = false;
 
     setLives(config.lives);
-  }, [level, difficulty, initializeBricks]);
+  }, [
+    level,
+    difficulty,
+    initializeBricks,
+    CANVAS_WIDTH,
+    CANVAS_HEIGHT,
+    PADDLE_Y,
+  ]);
 
   // Apply powerup effects with better balance
-  const applyPowerup = useCallback((type) => {
-    const game = gameRef.current;
+  const applyPowerup = useCallback(
+    (type) => {
+      const game = gameRef.current;
+      const maxPaddleWidth = Math.floor(CANVAS_WIDTH * 0.25);
+      const minPaddleWidth = Math.floor(CANVAS_WIDTH * 0.08);
 
-    switch (POWERUP_TYPES[type].effect) {
-      case "expand":
-        game.paddle.width = Math.min(game.paddle.width + 25, 180);
-        break;
-      case "shrink":
-        game.paddle.width = Math.max(game.paddle.width - 15, 70);
-        break;
-      case "multiball":
-        if (game.balls.length < 4) {
-          // Limit to 4 balls max
-          const mainBall = game.balls.find((b) => b.active);
-          if (mainBall) {
-            const angle1 = Math.PI / 6; // 30 degrees
-            const angle2 = -Math.PI / 6; // -30 degrees
-            const speed = Math.sqrt(
-              mainBall.dx * mainBall.dx + mainBall.dy * mainBall.dy
-            );
+      switch (POWERUP_TYPES[type].effect) {
+        case "expand":
+          game.paddle.width = Math.min(
+            game.paddle.width + Math.floor(CANVAS_WIDTH / 32),
+            maxPaddleWidth
+          );
+          break;
+        case "shrink":
+          game.paddle.width = Math.max(
+            game.paddle.width - Math.floor(CANVAS_WIDTH / 50),
+            minPaddleWidth
+          );
+          break;
+        case "multiball":
+          if (game.balls.length < 4) {
+            // Limit to 4 balls max
+            const mainBall = game.balls.find((b) => b.active);
+            if (mainBall) {
+              const angle1 = Math.PI / 6; // 30 degrees
+              const angle2 = -Math.PI / 6; // -30 degrees
+              const speed = Math.sqrt(
+                mainBall.dx * mainBall.dx + mainBall.dy * mainBall.dy
+              );
 
-            game.balls.push(
-              createBall(
-                mainBall.x,
-                mainBall.y,
-                speed * Math.sin(angle1),
-                -speed * Math.cos(angle1)
-              )
-            );
-            game.balls.push(
-              createBall(
-                mainBall.x,
-                mainBall.y,
-                speed * Math.sin(angle2),
-                -speed * Math.cos(angle2)
-              )
-            );
+              game.balls.push(
+                createBall(
+                  mainBall.x,
+                  mainBall.y,
+                  speed * Math.sin(angle1),
+                  -speed * Math.cos(angle1)
+                )
+              );
+              game.balls.push(
+                createBall(
+                  mainBall.x,
+                  mainBall.y,
+                  speed * Math.sin(angle2),
+                  -speed * Math.cos(angle2)
+                )
+              );
+            }
           }
-        }
-        break;
-      case "life":
-        setLives((prev) => Math.min(prev + 1, 5));
-        break;
-      case "bigball":
-        game.balls.forEach((ball) => {
-          if (ball.active) ball.radius = Math.min(ball.radius + 2, 14);
-        });
-        break;
-    }
-  }, []);
+          break;
+        case "life":
+          setLives((prev) => Math.min(prev + 1, 5));
+          break;
+        case "bigball":
+          game.balls.forEach((ball) => {
+            if (ball.active)
+              ball.radius = Math.min(
+                ball.radius + 2,
+                Math.floor(CANVAS_WIDTH / 50)
+              );
+          });
+          break;
+      }
+    },
+    [CANVAS_WIDTH]
+  );
 
   // Improved collision detection
   const circleRectCollision = (circle, rect) => {
@@ -501,8 +579,8 @@ const BrickBreakerGame = () => {
         };
 
         if (
-          powerup.x >= paddleRect.x &&
-          powerup.x <= paddleRect.x + paddleRect.width &&
+          powerup.x >= paddleRect.x - powerup.width / 2 &&
+          powerup.x <= paddleRect.x + paddleRect.width + powerup.width / 2 &&
           powerup.y + powerup.height >= paddleRect.y &&
           powerup.y <= paddleRect.y + paddleRect.height
         ) {
@@ -602,7 +680,10 @@ const BrickBreakerGame = () => {
         if (brick.maxHits > 1) {
           ctx.globalAlpha = 1;
           ctx.fillStyle = "white";
-          ctx.font = "bold 12px Arial";
+          ctx.font = `bold ${Math.max(
+            10,
+            Math.floor(CANVAS_HEIGHT / 50)
+          )}px Arial`;
           ctx.textAlign = "center";
           ctx.fillText(
             brick.hits.toString(),
@@ -630,7 +711,10 @@ const BrickBreakerGame = () => {
         );
 
         ctx.fillStyle = "white";
-        ctx.font = "bold 14px Arial";
+        ctx.font = `bold ${Math.max(
+          12,
+          Math.floor(CANVAS_HEIGHT / 45)
+        )}px Arial`;
         ctx.textAlign = "center";
         ctx.fillText(
           POWERUP_TYPES[powerup.type].symbol,
@@ -644,13 +728,12 @@ const BrickBreakerGame = () => {
     // Draw instructions if game hasn't started
     if (!game.gameStarted) {
       ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-      ctx.font = "20px Arial";
+      ctx.font = `${Math.max(16, Math.floor(CANVAS_HEIGHT / 35))}px Arial`;
       ctx.textAlign = "center";
-      ctx.fillText(
-        "Press ARROW KEYS or SPACE to start!",
-        CANVAS_WIDTH / 2,
-        CANVAS_HEIGHT / 2 + 50
-      );
+      const instructionText = isMobile
+        ? "Touch to start and move paddle!"
+        : "Press ARROW KEYS or SPACE to start!";
+      ctx.fillText(instructionText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
     }
 
     animationRef.current = requestAnimationFrame(gameLoop);
@@ -662,6 +745,9 @@ const BrickBreakerGame = () => {
     applyPowerup,
     saveHighScore,
     savedHighScores,
+    CANVAS_WIDTH,
+    CANVAS_HEIGHT,
+    isMobile,
   ]);
 
   // Start game loop
@@ -699,16 +785,20 @@ const BrickBreakerGame = () => {
       gameRef.current.keys[e.key] = false;
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    if (!isMobile) {
+      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
+    }
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      if (!isMobile) {
+        window.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("keyup", handleKeyUp);
+      }
     };
-  }, [gameState]);
+  }, [gameState, isMobile]);
 
-  // Mouse/touch controls
+  // Enhanced mouse/touch controls
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -728,12 +818,28 @@ const BrickBreakerGame = () => {
       }
     };
 
+    const handleClick = (e) => {
+      if (gameState === "playing" && !gameRef.current.gameStarted) {
+        gameRef.current.gameStarted = true;
+      }
+    };
+
+    const handleTouchStart = (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = CANVAS_WIDTH / rect.width;
+      gameRef.current.touchStartX = (touch.clientX - rect.left) * scaleX;
+      gameRef.current.lastTouchTime = Date.now();
+    };
+
     const handleTouchMove = (e) => {
       e.preventDefault();
-      if (gameState === "playing" && e.touches.length > 0) {
+      if (gameState === "playing") {
+        const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
         const scaleX = CANVAS_WIDTH / rect.width;
-        const x = (e.touches[0].clientX - rect.left) * scaleX;
+        const x = (touch.clientX - rect.left) * scaleX;
         gameRef.current.paddle.x = Math.max(
           0,
           Math.min(
@@ -744,407 +850,307 @@ const BrickBreakerGame = () => {
       }
     };
 
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    const handleTouchEnd = (e) => {
+      e.preventDefault();
+      const currentTime = Date.now();
+      const timeDiff = currentTime - gameRef.current.lastTouchTime;
+
+      if (
+        gameState === "playing" &&
+        !gameRef.current.gameStarted &&
+        timeDiff < 300
+      ) {
+        gameRef.current.gameStarted = true;
+      }
+    };
+
+    if (isMobile) {
+      canvas.addEventListener("touchstart", handleTouchStart, {
+        passive: false,
+      });
+      canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+      canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+    } else {
+      canvas.addEventListener("mousemove", handleMouseMove);
+      canvas.addEventListener("click", handleClick);
+    }
 
     return () => {
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("touchmove", handleTouchMove);
+      if (isMobile) {
+        canvas.removeEventListener("touchstart", handleTouchStart);
+        canvas.removeEventListener("touchmove", handleTouchMove);
+        canvas.removeEventListener("touchend", handleTouchEnd);
+      } else {
+        canvas.removeEventListener("mousemove", handleMouseMove);
+        canvas.removeEventListener("click", handleClick);
+      }
     };
-  }, [gameState]);
+  }, [gameState, CANVAS_WIDTH, isMobile]);
+
+  // Start new game
+  const startNewGame = () => {
+    setScore(0);
+    setLevel(1);
+    setGameState("playing");
+    resetGame();
+  };
+
+  // Continue to next level
+  const nextLevel = () => {
+    setLevel((prev) => prev + 1);
+    setGameState("playing");
+    resetGame();
+  };
+
+  // Restart current level
+  const restartLevel = () => {
+    setGameState("playing");
+    resetGame();
+  };
 
   // Update high score when difficulty changes
   useEffect(() => {
     setHighScore(savedHighScores[difficulty]);
   }, [difficulty, savedHighScores]);
 
-  // Game control functions
-  const startGame = () => {
-    setScore(0);
-    setLevel(1);
-    resetGame();
-    setGameState("playing");
-  };
-
-  const selectDifficulty = (diff) => {
-    setDifficulty(diff);
-    setGameState("menu");
-  };
-
-  const nextLevel = () => {
-    setLevel((prev) => prev + 1);
-    resetGame();
-    setGameState("playing");
-  };
-
-  // Initialize canvas
+  // Reset game when difficulty changes
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      canvas.width = CANVAS_WIDTH;
-      canvas.height = CANVAS_HEIGHT;
+    if (gameState === "playing") {
       resetGame();
     }
-  }, [resetGame]);
+  }, [difficulty, resetGame, gameState]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white overflow-x-hidden relative">
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-2 h-2 bg-purple-400 rounded-full animate-pulse opacity-60"></div>
-        <div className="absolute top-32 right-20 w-1 h-1 bg-cyan-400 rounded-full animate-pulse opacity-40 animation-delay-1000"></div>
-        <div className="absolute bottom-40 left-1/4 w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse opacity-50 animation-delay-2000"></div>
-        <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-indigo-400 rounded-full animate-pulse opacity-30 animation-delay-3000"></div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+      <div className="text-center mb-4">
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-2 bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text sm:text-transparent">
+          BRICK BREAKER
+        </h1>
+        <div className="flex flex-wrap justify-center gap-4 text-white text-sm md:text-lg">
+          <div>
+            Score: <span className="font-bold text-cyan-400">{score}</span>
+          </div>
+          <div>
+            Lives: <span className="font-bold text-red-400">{lives}</span>
+          </div>
+          <div>
+            Level: <span className="font-bold text-green-400">{level}</span>
+          </div>
+          <div>
+            High Score:{" "}
+            <span className="font-bold text-yellow-400">{highScore}</span>
+          </div>
+        </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 relative">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent mb-6 drop-shadow-2xl animate-pulse">
-            BRICK BREAKER
-          </h1>
-          <div className="flex justify-center flex-wrap gap-6 text-xl">
-            <div className="flex flex-col items-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-cyan-500/30 shadow-lg hover:shadow-cyan-500/20 transition-all duration-300">
-              <span className="text-cyan-400 font-semibold text-sm uppercase tracking-wider">
-                Score
-              </span>
-              <span className="text-3xl font-bold bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
-                {score.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex flex-col items-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-red-500/30 shadow-lg hover:shadow-red-500/20 transition-all duration-300">
-              <span className="text-red-400 font-semibold text-sm uppercase tracking-wider">
-                Lives
-              </span>
-              <div className="text-3xl">
-                {Array.from({ length: lives }, (_, i) => (
-                  <span
-                    key={i}
-                    className="text-red-500 drop-shadow-lg animate-pulse"
-                  >
-                    ♥
-                  </span>
-                ))}
-                {Array.from(
-                  { length: getDifficultyConfig(difficulty).lives - lives },
-                  (_, i) => (
-                    <span key={i} className="text-gray-600/50">
-                      ♡
-                    </span>
-                  )
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col items-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-yellow-500/30 shadow-lg hover:shadow-yellow-500/20 transition-all duration-300">
-              <span className="text-yellow-400 font-semibold text-sm uppercase tracking-wider">
-                Level
-              </span>
-              <span className="text-3xl font-bold bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
-                {level}
-              </span>
-            </div>
-            <div className="flex flex-col items-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-purple-500/30 shadow-lg hover:shadow-purple-500/20 transition-all duration-300">
-              <span className="text-purple-400 font-semibold text-sm uppercase tracking-wider">
-                High Score
-              </span>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-300 to-pink-400 bg-clip-text text-transparent">
-                {highScore.toLocaleString()}
-              </span>
-              <span className="text-xs text-gray-400 capitalize mt-1 px-2 py-1 bg-slate-700/50 rounded-full">
-                ({difficulty})
-              </span>
-            </div>
+      {gameState === "menu" && (
+        <div className="text-center">
+          <div className="bg-black/30 backdrop-blur-sm rounded-xl p-8 mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
+              Welcome to Brick Breaker!
+            </h2>
+            <p className="text-gray-300 mb-6 max-w-md">
+              Break all the bricks to advance to the next level. Collect
+              power-ups to help you succeed!
+            </p>
+            <button
+              onClick={() => setGameState("difficulty")}
+              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
+            >
+              START GAME
+            </button>
           </div>
         </div>
+      )}
 
-        {/* Game Canvas */}
-        <div className="flex justify-center mb-8">
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              className="border-4 border-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-2xl shadow-2xl shadow-orange-500/30 bg-gradient-to-br bg-from-slate-900 bg-to-purple-900 hover:shadow-orange-500/50 transition-shadow duration-500"
-              style={{ maxWidth: "100%", height: "auto" }}
-            />
-
-            {/* Game State Overlays */}
-            {gameState === "menu" && (
-              <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-slate-900/90 to-purple-900/90 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                <div className="text-center p-8">
-                  <h2 className="text-5xl font-bold mb-8 bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent animate-pulse">
-                    Welcome to Brick Breaker!
-                  </h2>
-                  <div className="space-y-6">
-                    <button
-                      onClick={() => setGameState("difficulty")}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 hover:from-red-600 hover:via-orange-600 hover:to-yellow-600 rounded-xl font-bold text-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-orange-500/50 border border-orange-400/30"
-                    >
-                      🎮 Start Game
-                    </button>
-                    <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl p-6 border border-slate-600/30">
-                      <p className="text-orange-300 text-xl font-semibold mb-4">
-                        🎯 Controls
-                      </p>
-                      <div className="space-y-2 text-gray-300 text-lg">
-                        <p className="flex items-center justify-center gap-2">
-                          <span className="bg-slate-700 px-3 py-1 rounded-lg text-sm">
-                            ←→
-                          </span>{" "}
-                          Arrow keys or mouse to move paddle
-                        </p>
-                        <p className="flex items-center justify-center gap-2">
-                          <span className="bg-slate-700 px-3 py-1 rounded-lg text-sm">
-                            SPACE
-                          </span>{" "}
-                          Pause/Unpause
-                        </p>
-                        <p className="text-yellow-400">
-                          ✨ Collect power-ups for special effects!
-                        </p>
-                      </div>
-                    </div>
+      {gameState === "difficulty" && (
+        <div className="text-center">
+          <div className="bg-black/30 backdrop-blur-sm rounded-xl p-8 mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
+              Choose Difficulty
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {["easy", "medium", "hard"].map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setDifficulty(diff)}
+                  className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                    difficulty === diff
+                      ? "border-cyan-400 bg-cyan-400/20 text-cyan-400"
+                      : "border-gray-600 bg-gray-800/50 text-white hover:border-gray-400"
+                  }`}
+                >
+                  <div className="font-bold text-xl capitalize">{diff}</div>
+                  <div className="text-sm opacity-75">
+                    {diff === "easy" && "5 Lives • Slow Ball • Wide Paddle"}
+                    {diff === "medium" &&
+                      "3 Lives • Medium Ball • Normal Paddle"}
+                    {diff === "hard" && "2 Lives • Fast Ball • Narrow Paddle"}
                   </div>
-                </div>
-              </div>
-            )}
-
-            {gameState === "difficulty" && (
-              <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-slate-900/90 to-purple-900/90 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                <div className="text-center p-8">
-                  <h2 className="text-5xl font-bold mb-8 bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
-                    🎯 Choose Difficulty
-                  </h2>
-                  <div className="space-y-4">
-                    <button
-                      onClick={() => {
-                        selectDifficulty("easy");
-                        startGame();
-                      }}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-green-500/50 border border-green-400/30"
-                    >
-                      🟢 Easy{" "}
-                      <span className="text-sm opacity-80">
-                        (5 Lives, Slow Ball)
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        selectDifficulty("medium");
-                        startGame();
-                      }}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-yellow-500/50 border border-yellow-400/30"
-                    >
-                      🟡 Medium{" "}
-                      <span className="text-sm opacity-80">
-                        (3 Lives, Normal Ball)
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        selectDifficulty("hard");
-                        startGame();
-                      }}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-500/50 border border-red-400/30"
-                    >
-                      🔴 Hard{" "}
-                      <span className="text-sm opacity-80">
-                        (2 Lives, Fast Ball)
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => setGameState("menu")}
-                      className="mt-6 px-8 py-3 bg-slate-700/50 hover:bg-slate-600/50 backdrop-blur-sm rounded-xl font-semibold transition-all duration-300 border border-slate-500/30"
-                    >
-                      ← Back
-                    </button>
+                  <div className="text-xs mt-1">
+                    High Score: {savedHighScores[diff]}
                   </div>
-                </div>
-              </div>
-            )}
-
-            {gameState === "paused" && (
-              <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-slate-900/90 to-purple-900/90 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                <div className="text-center p-8">
-                  <h2 className="text-5xl font-bold mb-8 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse">
-                    ⏸️ Game Paused
-                  </h2>
-                  <p className="text-2xl mb-8 text-gray-300">
-                    Press{" "}
-                    <span className="bg-slate-700 px-3 py-1 rounded-lg text-yellow-400">
-                      SPACEBAR
-                    </span>{" "}
-                    to continue
-                  </p>
-                  <div className="space-y-4">
-                    <button
-                      onClick={() => setGameState("playing")}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-green-500/50 border border-green-400/30"
-                    >
-                      ▶️ Resume
-                    </button>
-                    <button
-                      onClick={() => setGameState("menu")}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-500/50 border border-red-400/30"
-                    >
-                      🏠 Quit to Menu
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {gameState === "gameOver" && (
-              <div className="absolute inset-0 bg-gradient-to-br from-black/95 via-red-900/20 to-slate-900/95 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                <div className="text-center p-8">
-                  <h2 className="text-6xl font-bold mb-6 bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-                    💥 Game Over!
-                  </h2>
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-red-500/30">
-                    <p className="text-3xl mb-3">
-                      Final Score:{" "}
-                      <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent font-bold">
-                        {score.toLocaleString()}
-                      </span>
-                    </p>
-                    <p className="text-2xl mb-3">
-                      Level Reached:{" "}
-                      <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent font-bold">
-                        {level}
-                      </span>
-                    </p>
-                    {score === highScore && score > 0 && (
-                      <p className="text-3xl mb-6 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent font-bold animate-pulse">
-                        🎉 NEW HIGH SCORE! 🎉
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-4">
-                    <button
-                      onClick={startGame}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 hover:from-red-600 hover:via-orange-600 hover:to-yellow-600 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-500/50 border border-orange-400/30"
-                    >
-                      🔄 Play Again
-                    </button>
-                    <button
-                      onClick={() => setGameState("difficulty")}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/50 border border-purple-400/30"
-                    >
-                      🎯 Change Difficulty
-                    </button>
-                    <button
-                      onClick={() => setGameState("menu")}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-gray-500 to-slate-600 hover:from-gray-600 hover:to-slate-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg border border-gray-400/30"
-                    >
-                      🏠 Main Menu
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {gameState === "victory" && (
-              <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-yellow-900/20 to-slate-900/90 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                <div className="text-center p-8">
-                  <h2 className="text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent animate-pulse">
-                    🎉 Level Complete! 🎉
-                  </h2>
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-yellow-500/30">
-                    <p className="text-3xl mb-3">
-                      Score:{" "}
-                      <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent font-bold">
-                        {score.toLocaleString()}
-                      </span>
-                    </p>
-                    <p className="text-2xl mb-3 text-green-400">
-                      Level {level} cleared! ✅
-                    </p>
-                  </div>
-                  <div className="space-y-4">
-                    <button
-                      onClick={nextLevel}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-green-500/50 border border-green-400/30"
-                    >
-                      ➡️ Next Level
-                    </button>
-                    <button
-                      onClick={() => setGameState("menu")}
-                      className="block w-full px-10 py-5 bg-gradient-to-r from-gray-500 to-slate-600 hover:from-gray-600 hover:to-slate-700 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg border border-gray-400/30"
-                    >
-                      🏠 Main Menu
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Power-up Legend */}
-        <div className="max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
-            ⚡ Power-ups
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-green-500/50 shadow-lg hover:shadow-green-500/30 transition-all duration-300 hover:scale-105 text-center">
-              <div className="text-3xl mb-2 text-green-500 drop-shadow-lg">
-                ⬌
-              </div>
-              <div className="text-sm font-semibold text-green-300">
-                Expand Paddle
-              </div>
+                </button>
+              ))}
             </div>
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-red-500/50 shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 text-center">
-              <div className="text-3xl mb-2 text-red-500 drop-shadow-lg">⬍</div>
-              <div className="text-sm font-semibold text-red-300">
-                Shrink Paddle
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-yellow-500/50 shadow-lg hover:shadow-yellow-500/30 transition-all duration-300 hover:scale-105 text-center">
-              <div className="text-3xl mb-2 text-yellow-500 drop-shadow-lg">
-                ●●
-              </div>
-              <div className="text-sm font-semibold text-yellow-300">
-                Multi Ball
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-pink-500/50 shadow-lg hover:shadow-pink-500/30 transition-all duration-300 hover:scale-105 text-center">
-              <div className="text-3xl mb-2 text-pink-500 drop-shadow-lg">
-                ♥
-              </div>
-              <div className="text-sm font-semibold text-pink-300">
-                Extra Life
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-purple-500/50 shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:scale-105 text-center">
-              <div className="text-3xl mb-2 text-purple-500 drop-shadow-lg">
-                ●
-              </div>
-              <div className="text-sm font-semibold text-purple-300">
-                Bigger Ball
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Game Controls */}
-        {gameState === "playing" && (
-          <div className="text-center mt-8">
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => setGameState("paused")}
-                className="px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg border border-yellow-500/30"
+                onClick={startNewGame}
+                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
               >
-                ⏸️ Pause <span className="text-sm opacity-80">(Space)</span>
+                PLAY
               </button>
               <button
                 onClick={() => setGameState("menu")}
-                className="px-8 py-4 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg border border-red-500/30"
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
               >
-                🏠 Quit
+                BACK
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {gameState === "playing" && (
+        <div className="text-center">
+          <canvas
+            ref={canvasRef}
+            width={canvasSize.width}
+            height={canvasSize.height}
+            className="border-2 border-cyan-400 rounded-lg shadow-2xl shadow-cyan-500/20 mb-4"
+            style={{ touchAction: "none" }}
+          />
+          <div className="flex flex-wrap justify-center gap-2 text-white text-xs md:text-sm">
+            {!isMobile && (
+              <>
+                <span>←→ Move</span>
+                <span>•</span>
+                <span>SPACE Pause</span>
+                <span>•</span>
+              </>
+            )}
+            <span>Power-ups: ⬌Expand ⬍Shrink ●●Multi ♥Life ●Big</span>
+          </div>
+        </div>
+      )}
+
+      {gameState === "paused" && (
+        <div className="text-center">
+          <canvas
+            ref={canvasRef}
+            width={canvasSize.width}
+            height={canvasSize.height}
+            className="border-2 border-gray-500 rounded-lg shadow-2xl opacity-50 mb-4"
+          />
+          <div className="bg-black/50 backdrop-blur-sm rounded-xl p-6">
+            <h2 className="text-3xl font-bold text-white mb-4">PAUSED</h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => setGameState("playing")}
+                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200"
+              >
+                RESUME
+              </button>
+              <button
+                onClick={restartLevel}
+                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200"
+              >
+                RESTART LEVEL
+              </button>
+              <button
+                onClick={() => setGameState("menu")}
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200"
+              >
+                MAIN MENU
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {gameState === "gameOver" && (
+        <div className="text-center">
+          <div className="bg-black/50 backdrop-blur-sm rounded-xl p-8">
+            <h2 className="text-4xl font-bold text-red-400 mb-4">GAME OVER</h2>
+            <div className="text-white mb-6">
+              <div className="text-2xl mb-2">
+                Final Score:{" "}
+                <span className="text-cyan-400 font-bold">{score}</span>
+              </div>
+              <div className="text-lg">
+                Level Reached:{" "}
+                <span className="text-green-400 font-bold">{level}</span>
+              </div>
+              {score >= highScore && (
+                <div className="text-yellow-400 font-bold text-xl mt-2">
+                  🎉 NEW HIGH SCORE! 🎉
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={startNewGame}
+                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
+              >
+                PLAY AGAIN
+              </button>
+              <button
+                onClick={() => setGameState("difficulty")}
+                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
+              >
+                CHANGE DIFFICULTY
+              </button>
+              <button
+                onClick={() => setGameState("menu")}
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
+              >
+                MAIN MENU
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {gameState === "victory" && (
+        <div className="text-center">
+          <div className="bg-black/50 backdrop-blur-sm rounded-xl p-8">
+            <h2 className="text-4xl font-bold text-green-400 mb-4">
+              LEVEL COMPLETE!
+            </h2>
+            <div className="text-white mb-6">
+              <div className="text-2xl mb-2">
+                Score: <span className="text-cyan-400 font-bold">{score}</span>
+              </div>
+              <div className="text-lg">
+                Level: <span className="text-green-400 font-bold">{level}</span>
+              </div>
+              <div className="text-yellow-400 font-bold text-xl mt-2">
+                🎉 EXCELLENT! 🎉
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={nextLevel}
+                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
+              >
+                NEXT LEVEL
+              </button>
+              <button
+                onClick={restartLevel}
+                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
+              >
+                REPLAY LEVEL
+              </button>
+              <button
+                onClick={() => setGameState("menu")}
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
+              >
+                MAIN MENU
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
