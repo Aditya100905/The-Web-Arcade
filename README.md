@@ -2,6 +2,10 @@
 
 **Welcome to The Web Arcade** — a collection of classic and modern games reimagined for the web. Play, compete, and conquer across various categories like Puzzle, Classic, Logic, Memory, Strategy, and Arcade.
 
+## 🌐 Live Preview
+
+> https://the-web-azrcade.vercel.app
+
 ## Features
 
 - **Diverse Game Collection**: Enjoy games such as 2048, Rock Paper Scissors, Sudoku, Memory Matching, Tic Tac Toe, Flappy Bird, Brick Breaker, and Dots & Boxes.
@@ -27,10 +31,10 @@ To run the project locally, follow these steps:
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Aditya100905/The-Web-Arcade.git
 
 # Navigate into the project directory
-cd <project-directory>
+cd theWebArcade
 
 # Install dependencies
 npm install
