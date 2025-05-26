@@ -29,6 +29,9 @@ const SudokuGame = () => {
     }
   };
 
+  useEffect(() => {
+    document.title = "Sudoku";
+  }, []);
   const isValidMove = (puzzle, row, col, num) => {
     // Check row
     for (let x = 0; x < 9; x++) {

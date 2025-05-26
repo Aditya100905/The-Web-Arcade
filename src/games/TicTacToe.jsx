@@ -11,6 +11,10 @@ const TicTacToe = () => {
   const [scores, setScores] = useState({ X: 0, O: 0, draws: 0 });
   const [showCelebration, setShowCelebration] = useState(false);
 
+  useEffect(() => {
+    document.title = "Tic Tac Toe";
+  }, []);
+
   const winningCombinations = [
     [0, 1, 2],
     [3, 4, 5],

@@ -106,6 +106,9 @@ const MemoryMatching = () => {
     },
   });
 
+  useEffect(() => {
+    document.title = "Memory Matching";
+  }, []);
   // Load saved stats on component mount
   useEffect(() => {
     const savedStats = getStoredData("memoryGameStats", {

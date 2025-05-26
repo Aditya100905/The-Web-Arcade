@@ -34,6 +34,10 @@ const DotsAndBoxesGame = () => {
     player2: { primary: "#06b6d4", secondary: "#0891b2", name: "Blue" },
   });
 
+  useEffect(() => {
+    document.title = "Dots & Boxes";
+  }, []);
+
   const totalLines = gridSize * (gridSize - 1) + (gridSize - 1) * gridSize;
 
   const isLineSelected = useCallback(

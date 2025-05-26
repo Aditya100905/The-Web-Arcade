@@ -75,7 +75,7 @@ const games = [
   },
   {
     id: 4,
-    name: "Memory Matching",
+    name: "",
     category: "Memory",
     difficulty: "Easy",
     color: "from-pink-500 via-rose-500 to-red-500",

@@ -23,6 +23,10 @@ const Game2048 = () => {
     }
   });
 
+  useEffect(() => {
+    document.title = "2048";
+  }, []);
+
   // Save high score to localStorage whenever it changes
   useEffect(() => {
     try {

@@ -47,6 +47,10 @@ const RockPaperScissors = () => {
     return choice ? choice.icon : Hand;
   };
 
+  useEffect(() => {
+    document.title = "Rock Paper Scissors";
+  }, []);
+
   const playGame = (choice) => {
     setIsAnimating(true);
     const computerChoice = getCompChoice();

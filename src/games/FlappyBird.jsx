@@ -17,6 +17,10 @@ const FlappyBird = () => {
   const gameLoopRef = useRef();
   const containerRef = useRef();
 
+  useEffect(() => {
+    document.title = "Flappy Bird";
+  }, []);
+
   const GRAVITY = gameMode === "easy" ? 0.4 : gameMode === "hard" ? 0.8 : 0.6;
   const JUMP_FORCE = gameMode === "easy" ? -8 : gameMode === "hard" ? -10 : -9;
   const PIPE_WIDTH = Math.max(60, dimensions.width * 0.15);
