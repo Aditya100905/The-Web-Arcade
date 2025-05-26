@@ -10,7 +10,7 @@ const BrickBreakerGame = () => {
   const [highScore, setHighScore] = useState(0);
   const [difficulty, setDifficulty] = useState("medium");
   const [isMobile, setIsMobile] = useState(false);
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+  const [canvasSize, setCanvasSize] = useState({ width: 900, height: 900 });
 
   useEffect(() => {
     document.title = "Brick Breaker";
@@ -22,21 +22,29 @@ const BrickBreakerGame = () => {
       const mobile = window.innerWidth < 768 || "ontouchstart" in window;
       setIsMobile(mobile);
 
-      // Set responsive canvas size
-      const maxWidth = Math.min(window.innerWidth - 32, 800);
-      const maxHeight = Math.min(window.innerHeight * 0.6, 600);
-      const aspectRatio = 800 / 600;
-
-      let width, height;
-      if (maxWidth / aspectRatio <= maxHeight) {
-        width = maxWidth;
-        height = maxWidth / aspectRatio;
+      // Set responsive canvas size - much larger than before
+      if (mobile) {
+        // Mobile: use most of the screen height and full width
+        const maxWidth = Math.min(window.innerWidth - 20, 500);
+        const maxHeight = Math.min(window.innerHeight * 0.75, 900); // Use 75% of screen height
+        setCanvasSize({ width: maxWidth, height: maxHeight });
       } else {
-        height = maxHeight;
-        width = maxHeight * aspectRatio;
-      }
+        // Desktop: much larger canvas
+        const maxWidth = Math.min(window.innerWidth - 100, 1000);
+        const maxHeight = Math.min(window.innerHeight * 0.7, 750);
+        const aspectRatio = 4 / 3; // Better aspect ratio for gameplay
 
-      setCanvasSize({ width: Math.floor(width), height: Math.floor(height) });
+        let width, height;
+        if (maxWidth / aspectRatio <= maxHeight) {
+          width = maxWidth;
+          height = maxWidth / aspectRatio;
+        } else {
+          height = maxHeight;
+          width = height * aspectRatio;
+        }
+
+        setCanvasSize({ width: Math.floor(width), height: Math.floor(height) });
+      }
     };
 
     checkMobile();
@@ -47,9 +55,9 @@ const BrickBreakerGame = () => {
   // Game configuration based on difficulty - reduced speeds for better playability
   const getDifficultyConfig = (diff) => {
     const configs = {
-      easy: { ballSpeed: 3, paddleSpeed: 8, paddleWidth: 140, lives: 5 },
-      medium: { ballSpeed: 4, paddleSpeed: 7, paddleWidth: 120, lives: 3 },
-      hard: { ballSpeed: 5, paddleSpeed: 6, paddleWidth: 100, lives: 2 },
+      easy: { ballSpeed: 4, paddleSpeed: 8, paddleWidth: 140, lives: 5 },
+      medium: { ballSpeed: 5, paddleSpeed: 8, paddleWidth: 120, lives: 3 },
+      hard: { ballSpeed: 7, paddleSpeed: 8, paddleWidth: 100, lives: 2 },
     };
     return configs[diff];
   };
@@ -137,7 +145,7 @@ const BrickBreakerGame = () => {
       y,
       dx: dx || ballSpeed * (Math.random() > 0.5 ? 1 : -1),
       dy: dy || -ballSpeed,
-      radius: Math.max(8, Math.min(10, CANVAS_WIDTH / 80)), // Responsive ball size
+      radius: Math.max(8, Math.min(12, CANVAS_WIDTH / 70)), // Slightly bigger ball for larger canvas
       active: true,
       lastCollision: null, // Track last collision to prevent stuck balls
     };
@@ -177,12 +185,12 @@ const BrickBreakerGame = () => {
   const initializeBricks = useCallback(
     (level) => {
       const bricks = [];
-      const rows = Math.min(4 + Math.floor(level / 3), 7); // Fewer rows on mobile
-      const cols = isMobile ? 8 : 10; // Fewer columns on mobile
-      const brickWidth = Math.floor((CANVAS_WIDTH - 40) / cols) - 2;
-      const brickHeight = Math.max(20, Math.floor(CANVAS_HEIGHT / 30));
-      const padding = 2;
-      const offsetTop = Math.floor(CANVAS_HEIGHT * 0.15);
+      const rows = Math.min(5 + Math.floor(level / 3), 8); // More rows for larger canvas
+      const cols = isMobile ? 8 : 12; // More columns for desktop
+      const brickWidth = Math.floor((CANVAS_WIDTH - 60) / cols) - 3;
+      const brickHeight = Math.max(22, Math.floor(CANVAS_HEIGHT / 25));
+      const padding = 3;
+      const offsetTop = Math.floor(CANVAS_HEIGHT * 0.12);
       const totalWidth = cols * brickWidth + (cols - 1) * padding;
       const offsetLeft = (CANVAS_WIDTH - totalWidth) / 2;
 
@@ -241,8 +249,8 @@ const BrickBreakerGame = () => {
     return {
       x,
       y,
-      width: Math.max(25, Math.floor(CANVAS_WIDTH / 30)),
-      height: Math.max(18, Math.floor(CANVAS_HEIGHT / 35)),
+      width: Math.max(28, Math.floor(CANVAS_WIDTH / 28)),
+      height: Math.max(20, Math.floor(CANVAS_HEIGHT / 30)),
       type,
       dy: 1.5, // Slower falling powerups
       active: true,
@@ -262,7 +270,7 @@ const BrickBreakerGame = () => {
     game.paddle.x = CANVAS_WIDTH / 2 - scaledPaddleWidth / 2;
     game.paddle.y = PADDLE_Y;
     game.paddle.width = scaledPaddleWidth;
-    game.paddle.height = Math.max(12, Math.floor(CANVAS_HEIGHT / 40));
+    game.paddle.height = Math.max(15, Math.floor(CANVAS_HEIGHT / 35));
     game.paddle.speed = config.paddleSpeed;
     game.originalPaddleWidth = scaledPaddleWidth;
 
@@ -339,7 +347,7 @@ const BrickBreakerGame = () => {
             if (ball.active)
               ball.radius = Math.min(
                 ball.radius + 2,
-                Math.floor(CANVAS_WIDTH / 50)
+                Math.floor(CANVAS_WIDTH / 45)
               );
           });
           break;
@@ -681,8 +689,8 @@ const BrickBreakerGame = () => {
           ctx.globalAlpha = 1;
           ctx.fillStyle = "white";
           ctx.font = `bold ${Math.max(
-            10,
-            Math.floor(CANVAS_HEIGHT / 50)
+            12,
+            Math.floor(CANVAS_HEIGHT / 45)
           )}px Arial`;
           ctx.textAlign = "center";
           ctx.fillText(
@@ -712,8 +720,8 @@ const BrickBreakerGame = () => {
 
         ctx.fillStyle = "white";
         ctx.font = `bold ${Math.max(
-          12,
-          Math.floor(CANVAS_HEIGHT / 45)
+          14,
+          Math.floor(CANVAS_HEIGHT / 40)
         )}px Arial`;
         ctx.textAlign = "center";
         ctx.fillText(
@@ -728,7 +736,7 @@ const BrickBreakerGame = () => {
     // Draw instructions if game hasn't started
     if (!game.gameStarted) {
       ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-      ctx.font = `${Math.max(16, Math.floor(CANVAS_HEIGHT / 35))}px Arial`;
+      ctx.font = `${Math.max(18, Math.floor(CANVAS_HEIGHT / 30))}px Arial`;
       ctx.textAlign = "center";
       const instructionText = isMobile
         ? "Touch to start and move paddle!"
@@ -795,364 +803,462 @@ const BrickBreakerGame = () => {
         window.removeEventListener("keydown", handleKeyDown);
         window.removeEventListener("keyup", handleKeyUp);
       }
-    };
-  }, [gameState, isMobile]);
+    };}, [isMobile]);
 
-  // Enhanced mouse/touch controls
+  // Touch controls for mobile
   useEffect(() => {
+    if (!isMobile || !canvasRef.current) return;
+
     const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const handleMouseMove = (e) => {
-      if (gameState === "playing") {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = CANVAS_WIDTH / rect.width;
-        const x = (e.clientX - rect.left) * scaleX;
-        gameRef.current.paddle.x = Math.max(
-          0,
-          Math.min(
-            x - gameRef.current.paddle.width / 2,
-            CANVAS_WIDTH - gameRef.current.paddle.width
-          )
-        );
-      }
-    };
-
-    const handleClick = (e) => {
-      if (gameState === "playing" && !gameRef.current.gameStarted) {
-        gameRef.current.gameStarted = true;
-      }
-    };
+    const game = gameRef.current;
 
     const handleTouchStart = (e) => {
       e.preventDefault();
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      const scaleX = CANVAS_WIDTH / rect.width;
-      gameRef.current.touchStartX = (touch.clientX - rect.left) * scaleX;
-      gameRef.current.lastTouchTime = Date.now();
+      game.touchStartX = touch.clientX - rect.left;
+      game.lastTouchTime = Date.now();
     };
 
     const handleTouchMove = (e) => {
       e.preventDefault();
-      if (gameState === "playing") {
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = CANVAS_WIDTH / rect.width;
-        const x = (touch.clientX - rect.left) * scaleX;
-        gameRef.current.paddle.x = Math.max(
-          0,
-          Math.min(
-            x - gameRef.current.paddle.width / 2,
-            CANVAS_WIDTH - gameRef.current.paddle.width
-          )
-        );
+      if (gameState !== "playing") return;
+
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const touchX = touch.clientX - rect.left;
+      
+      // Scale touch position to canvas coordinates
+      const scaleX = CANVAS_WIDTH / rect.width;
+      const scaledTouchX = touchX * scaleX;
+
+      // Move paddle to touch position (centered)
+      game.paddle.x = Math.max(0, Math.min(CANVAS_WIDTH - game.paddle.width, scaledTouchX - game.paddle.width / 2));
+
+      // Start game on touch
+      if (!game.gameStarted) {
+        game.gameStarted = true;
       }
     };
 
     const handleTouchEnd = (e) => {
       e.preventDefault();
-      const currentTime = Date.now();
-      const timeDiff = currentTime - gameRef.current.lastTouchTime;
-
-      if (
-        gameState === "playing" &&
-        !gameRef.current.gameStarted &&
-        timeDiff < 300
-      ) {
-        gameRef.current.gameStarted = true;
+      const touchEndTime = Date.now();
+      
+      // Quick tap to pause/unpause
+      if (touchEndTime - game.lastTouchTime < 200 && Math.abs(e.changedTouches[0].clientX - game.touchStartX) < 10) {
+        if (gameState === "playing") {
+          setGameState("paused");
+        } else if (gameState === "paused") {
+          setGameState("playing");
+        }
       }
     };
 
-    if (isMobile) {
-      canvas.addEventListener("touchstart", handleTouchStart, {
-        passive: false,
-      });
-      canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
-      canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
-    } else {
-      canvas.addEventListener("mousemove", handleMouseMove);
-      canvas.addEventListener("click", handleClick);
-    }
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
 
     return () => {
-      if (isMobile) {
-        canvas.removeEventListener("touchstart", handleTouchStart);
-        canvas.removeEventListener("touchmove", handleTouchMove);
-        canvas.removeEventListener("touchend", handleTouchEnd);
-      } else {
-        canvas.removeEventListener("mousemove", handleMouseMove);
-        canvas.removeEventListener("click", handleClick);
-      }
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [gameState, CANVAS_WIDTH, isMobile]);
+  }, [isMobile, gameState, CANVAS_WIDTH]);
 
-  // Start new game
-  const startNewGame = () => {
+  // Game state handlers
+  const startGame = () => {
+    resetGame();
     setScore(0);
     setLevel(1);
+    setHighScore(savedHighScores[difficulty]);
     setGameState("playing");
-    resetGame();
   };
 
-  // Continue to next level
   const nextLevel = () => {
-    setLevel((prev) => prev + 1);
+    setLevel(prev => prev + 1);
+    setScore(prev => prev + 500); // Level completion bonus
     setGameState("playing");
-    resetGame();
   };
 
-  // Restart current level
-  const restartLevel = () => {
-    setGameState("playing");
-    resetGame();
+  const restartGame = () => {
+    setLevel(1);
+    setScore(0);
+    startGame();
   };
+
+  const backToMenu = () => {
+    setGameState("menu");
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
+  const selectDifficulty = (diff) => {
+    setDifficulty(diff);
+    setHighScore(savedHighScores[diff]);
+    setGameState("menu");
+  };
+
+  // Initialize game when starting
+  useEffect(() => {
+    if (gameState === "playing") {
+      resetGame();
+    }
+  }, [gameState, resetGame]);
 
   // Update high score when difficulty changes
   useEffect(() => {
     setHighScore(savedHighScores[difficulty]);
   }, [difficulty, savedHighScores]);
 
-  // Reset game when difficulty changes
-  useEffect(() => {
-    if (gameState === "playing") {
-      resetGame();
-    }
-  }, [difficulty, resetGame, gameState]);
+const MenuScreen = () => (
+  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
+    <div className="text-center w-full max-w-md">
+      <h1 className="text-4xl sm:text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+        BRICK
+      </h1>
+      <h1 className="text-4xl sm:text-5xl font-bold mb-8 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+        BREAKER
+      </h1>
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
-      <div className="text-center mb-4">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-2 bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text sm:text-transparent">
-          BRICK BREAKER
-        </h1>
-        <div className="flex flex-wrap justify-center gap-4 text-white text-sm md:text-lg">
-          <div>
-            Score: <span className="font-bold text-cyan-400">{score}</span>
+      <div className="mb-10 p-4 bg-black/20 rounded-lg backdrop-blur-sm">
+        <p className="text-base sm:text-lg mb-2">High Score ({difficulty})</p>
+        <p className="text-2xl sm:text-3xl font-bold text-cyan-400">{highScore.toLocaleString()}</p>
+      </div>
+
+      <div className="space-y-4">
+        <button
+          onClick={startGame}
+          className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105"
+        >
+          START GAME
+        </button>
+
+        <button
+          onClick={() => setGameState("difficulty")}
+          className="w-full py-3 px-6 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 rounded-lg font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105"
+        >
+          DIFFICULTY: {difficulty.toUpperCase()}
+        </button>
+
+        <div className="text-xs sm:text-sm text-gray-300 mt-6 space-y-1">
+          <p>{isMobile ? "Touch to move paddle" : "Arrow keys to move paddle"}</p>
+          <p>{isMobile ? "Quick tap to pause" : "Spacebar to pause"}</p>
+          <p>Break all bricks to advance!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+
+const DifficultyScreen = () => (
+  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
+    <div className="text-center w-full max-w-md">
+      <h2 className="text-3xl sm:text-4xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+        SELECT DIFFICULTY
+      </h2>
+
+      <div className="space-y-4 mb-10">
+        {["easy", "medium", "hard"].map((diff) => {
+          const config = getDifficultyConfig(diff);
+          const isSelected = difficulty === diff;
+
+          return (
+            <div
+              key={diff}
+              onClick={() => selectDifficulty(diff)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && selectDifficulty(diff)}
+              aria-pressed={isSelected}
+              className={`p-4 rounded-lg cursor-pointer transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                isSelected
+                  ? "bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg"
+                  : "bg-black/20 hover:bg-black/30"
+              } backdrop-blur-sm`}
+            >
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg sm:text-xl font-bold capitalize">{diff}</h3>
+                <span className="text-base sm:text-lg font-mono text-cyan-400">
+                  {savedHighScores[diff].toLocaleString()}
+                </span>
+              </div>
+              <div className="text-sm text-gray-300">
+                <p>
+                  Lives: {config.lives} | Speed: {config.ballSpeed} | Paddle: {config.paddleWidth}px
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        onClick={() => setGameState("menu")}
+        className="w-full py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200"
+      >
+        BACK
+      </button>
+    </div>
+  </div>
+);
+
+const GameOverScreen = () => (
+  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
+    <div className="text-center w-full max-w-md">
+      <h2 className="text-4xl sm:text-5xl font-bold mb-6 text-red-400">GAME OVER</h2>
+      
+      <div className="mb-10 space-y-4">
+        <div className="p-4 bg-black/20 rounded-lg backdrop-blur-sm">
+          <p className="text-base sm:text-lg mb-1">Final Score</p>
+          <p className="text-2xl sm:text-3xl font-bold text-cyan-400">{score.toLocaleString()}</p>
+        </div>
+        
+        <div className="p-4 bg-black/20 rounded-lg backdrop-blur-sm">
+          <p className="text-base sm:text-lg mb-1">Level Reached</p>
+          <p className="text-xl sm:text-2xl font-bold text-purple-400">{level}</p>
+        </div>
+
+        {score === savedHighScores[difficulty] && (
+          <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
+            <p className="font-bold">🏆 NEW HIGH SCORE! 🏆</p>
           </div>
-          <div>
-            Lives: <span className="font-bold text-red-400">{lives}</span>
-          </div>
-          <div>
-            Level: <span className="font-bold text-green-400">{level}</span>
-          </div>
-          <div>
-            High Score:{" "}
-            <span className="font-bold text-yellow-400">{highScore}</span>
-          </div>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <button
+          onClick={restartGame}
+          className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105"
+        >
+          PLAY AGAIN
+        </button>
+        
+        <button
+          onClick={backToMenu}
+          className="w-full py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200"
+        >
+          MAIN MENU
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+const VictoryScreen = () => (
+  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 text-white p-4 sm:p-8">
+    <div className="text-center w-full max-w-xs sm:max-w-md">
+      <h2 className={`${isMobile ? 'text-3xl' : 'text-5xl'} font-bold mb-4 text-green-400`}>
+        LEVEL COMPLETE!
+      </h2>
+      
+      <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
+        <div className={`${isMobile ? 'p-3' : 'p-4'} bg-black/20 rounded-lg backdrop-blur-sm`}>
+          <p className={`${isMobile ? 'text-base' : 'text-lg'} mb-1`}>Score</p>
+          <p className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-cyan-400`}>
+            {score.toLocaleString()}
+          </p>
+        </div>
+        
+        <div className={`${isMobile ? 'p-3' : 'p-4'} bg-black/20 rounded-lg backdrop-blur-sm`}>
+          <p className={`${isMobile ? 'text-base' : 'text-lg'} mb-1`}>Level Completed</p>
+          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-purple-400`}>
+            {level}
+          </p>
+        </div>
+        
+        <div className={`${isMobile ? 'p-2' : 'p-3'} bg-gradient-to-r from-green-500 to-teal-500 rounded-lg`}>
+          <p className={`font-bold ${isMobile ? 'text-sm' : 'text-base'}`}>
+            +500 Bonus Points!
+          </p>
         </div>
       </div>
 
-      {gameState === "menu" && (
-        <div className="text-center">
-          <div className="bg-black/30 backdrop-blur-sm rounded-xl p-8 mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-              Welcome to Brick Breaker!
-            </h2>
-            <p className="text-gray-300 mb-6 max-w-md">
-              Break all the bricks to advance to the next level. Collect
-              power-ups to help you succeed!
-            </p>
-            <button
-              onClick={() => setGameState("difficulty")}
-              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
-            >
-              START GAME
-            </button>
-          </div>
-        </div>
-      )}
-
-      {gameState === "difficulty" && (
-        <div className="text-center">
-          <div className="bg-black/30 backdrop-blur-sm rounded-xl p-8 mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-              Choose Difficulty
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              {["easy", "medium", "hard"].map((diff) => (
-                <button
-                  key={diff}
-                  onClick={() => setDifficulty(diff)}
-                  className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                    difficulty === diff
-                      ? "border-cyan-400 bg-cyan-400/20 text-cyan-400"
-                      : "border-gray-600 bg-gray-800/50 text-white hover:border-gray-400"
-                  }`}
-                >
-                  <div className="font-bold text-xl capitalize">{diff}</div>
-                  <div className="text-sm opacity-75">
-                    {diff === "easy" && "5 Lives • Slow Ball • Wide Paddle"}
-                    {diff === "medium" &&
-                      "3 Lives • Medium Ball • Normal Paddle"}
-                    {diff === "hard" && "2 Lives • Fast Ball • Narrow Paddle"}
-                  </div>
-                  <div className="text-xs mt-1">
-                    High Score: {savedHighScores[diff]}
-                  </div>
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={startNewGame}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
-              >
-                PLAY
-              </button>
-              <button
-                onClick={() => setGameState("menu")}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
-              >
-                BACK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {gameState === "playing" && (
-        <div className="text-center">
-          <canvas
-            ref={canvasRef}
-            width={canvasSize.width}
-            height={canvasSize.height}
-            className="border-2 border-cyan-400 rounded-lg shadow-2xl shadow-cyan-500/20 mb-4"
-            style={{ touchAction: "none" }}
-          />
-          <div className="flex flex-wrap justify-center gap-2 text-white text-xs md:text-sm">
-            {!isMobile && (
-              <>
-                <span>←→ Move</span>
-                <span>•</span>
-                <span>SPACE Pause</span>
-                <span>•</span>
-              </>
-            )}
-            <span>Power-ups: ⬌Expand ⬍Shrink ●●Multi ♥Life ●Big</span>
-          </div>
-        </div>
-      )}
-
-      {gameState === "paused" && (
-        <div className="text-center">
-          <canvas
-            ref={canvasRef}
-            width={canvasSize.width}
-            height={canvasSize.height}
-            className="border-2 border-gray-500 rounded-lg shadow-2xl opacity-50 mb-4"
-          />
-          <div className="bg-black/50 backdrop-blur-sm rounded-xl p-6">
-            <h2 className="text-3xl font-bold text-white mb-4">PAUSED</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => setGameState("playing")}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200"
-              >
-                RESUME
-              </button>
-              <button
-                onClick={restartLevel}
-                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200"
-              >
-                RESTART LEVEL
-              </button>
-              <button
-                onClick={() => setGameState("menu")}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200"
-              >
-                MAIN MENU
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {gameState === "gameOver" && (
-        <div className="text-center">
-          <div className="bg-black/50 backdrop-blur-sm rounded-xl p-8">
-            <h2 className="text-4xl font-bold text-red-400 mb-4">GAME OVER</h2>
-            <div className="text-white mb-6">
-              <div className="text-2xl mb-2">
-                Final Score:{" "}
-                <span className="text-cyan-400 font-bold">{score}</span>
-              </div>
-              <div className="text-lg">
-                Level Reached:{" "}
-                <span className="text-green-400 font-bold">{level}</span>
-              </div>
-              {score >= highScore && (
-                <div className="text-yellow-400 font-bold text-xl mt-2">
-                  🎉 NEW HIGH SCORE! 🎉
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={startNewGame}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
-              >
-                PLAY AGAIN
-              </button>
-              <button
-                onClick={() => setGameState("difficulty")}
-                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
-              >
-                CHANGE DIFFICULTY
-              </button>
-              <button
-                onClick={() => setGameState("menu")}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
-              >
-                MAIN MENU
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {gameState === "victory" && (
-        <div className="text-center">
-          <div className="bg-black/50 backdrop-blur-sm rounded-xl p-8">
-            <h2 className="text-4xl font-bold text-green-400 mb-4">
-              LEVEL COMPLETE!
-            </h2>
-            <div className="text-white mb-6">
-              <div className="text-2xl mb-2">
-                Score: <span className="text-cyan-400 font-bold">{score}</span>
-              </div>
-              <div className="text-lg">
-                Level: <span className="text-green-400 font-bold">{level}</span>
-              </div>
-              <div className="text-yellow-400 font-bold text-xl mt-2">
-                🎉 EXCELLENT! 🎉
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={nextLevel}
-                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105"
-              >
-                NEXT LEVEL
-              </button>
-              <button
-                onClick={restartLevel}
-                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
-              >
-                REPLAY LEVEL
-              </button>
-              <button
-                onClick={() => setGameState("menu")}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200"
-              >
-                MAIN MENU
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="space-y-3">
+        <button
+          onClick={nextLevel}
+          className={`w-full ${isMobile ? 'py-2 px-4 text-sm' : 'py-3 px-6'} bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105`}
+        >
+          NEXT LEVEL
+        </button>
+        
+        <button
+          onClick={backToMenu}
+          className={`w-full ${isMobile ? 'py-2 px-4 text-sm' : 'py-2 px-6'} bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200`}
+        >
+          MAIN MENU
+        </button>
+      </div>
     </div>
-  );
+  </div>
+);
+
+const PausedScreen = () => (
+  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10">
+    <div className="text-center text-white w-full max-w-sm px-4">
+      <h2 className="text-3xl sm:text-4xl font-bold mb-8">PAUSED</h2>
+
+      <div className="space-y-4">
+        <button
+          onClick={() => setGameState("playing")}
+          className="w-full max-w-xs mx-auto block py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold text-base transition-all duration-200 transform hover:scale-105"
+        >
+          RESUME
+        </button>
+
+        <button
+          onClick={backToMenu}
+          className="w-full max-w-xs mx-auto block py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold text-base transition-all duration-200"
+        >
+          MAIN MENU
+        </button>
+      </div>
+
+      <p className="text-sm text-gray-300 mt-6">
+        {isMobile ? "Tap to resume" : "Press SPACE to resume"}
+      </p>
+    </div>
+  </div>
+);
+
+
+  const GameHUD = () => (
+  <div className={`absolute top-2 left-2 right-2 flex justify-between text-white z-10 ${
+    isMobile ? 'text-xs' : 'text-sm'
+  }`}>
+    <div className={`flex ${isMobile ? 'flex-col space-y-1' : 'space-x-6'}`}>
+      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
+        <span className="text-xs">Score: </span>
+        <span className="font-bold text-cyan-400">{score.toLocaleString()}</span>
+      </div>
+      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
+        <span className="text-xs">Level: </span>
+        <span className="font-bold text-purple-400">{level}</span>
+      </div>
+    </div>
+    
+    <div className={`flex ${isMobile ? 'flex-col space-y-1 items-end' : 'space-x-6'}`}>
+      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
+        <span className="text-xs">Lives: </span>
+        <span className="font-bold text-red-400">{"❤️".repeat(lives)}</span>
+      </div>
+      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
+        <span className="text-xs">High: </span>
+        <span className="font-bold text-yellow-400">{highScore.toLocaleString()}</span>
+      </div>
+    </div>
+  </div>
+);
+
+return (
+  <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-2 sm:p-4">
+    <div 
+      className="relative bg-slate-800/30 backdrop-blur-sm rounded-xl shadow-2xl border border-slate-700/50 overflow-hidden"
+      style={{ 
+        width: Math.min(canvasSize.width + (isMobile ? 8 : 16), window.innerWidth - (isMobile ? 16 : 32)), 
+        height: Math.min(canvasSize.height + (isMobile ? 8 : 16), window.innerHeight - (isMobile ? 16 : 32)),
+        maxWidth: isMobile ? '100vw' : 'calc(100vw - 2rem)',
+        maxHeight: isMobile ? '100vh' : 'calc(100vh - 2rem)'
+      }}
+    >
+      {/* Decorative corner elements */}
+      <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-cyan-500/30 rounded-tl-lg"></div>
+      <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-cyan-500/30 rounded-tr-lg"></div>
+      <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-cyan-500/30 rounded-bl-lg"></div>
+      <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-cyan-500/30 rounded-br-lg"></div>
+      
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-cyan-400/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-blue-400/20 rounded-full animate-pulse delay-500"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-purple-400/20 rounded-full animate-pulse delay-1000"></div>
+      </div>
+
+      {/* Content container */}
+      <div 
+        className="w-full h-full flex items-center justify-center p-2"
+        style={{ 
+          minWidth: canvasSize.width,
+          minHeight: canvasSize.height 
+        }}
+      >
+        {gameState === "menu" && <MenuScreen />}
+        {gameState === "difficulty" && <DifficultyScreen />}
+        {gameState === "gameOver" && <GameOverScreen />}
+        {gameState === "victory" && <VictoryScreen />}
+        
+        {(gameState === "playing" || gameState === "paused") && (
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              width={canvasSize.width}
+              height={canvasSize.height}
+              className="border border-cyan-500/30 rounded-lg shadow-xl transition-all duration-300 hover:border-cyan-500/50"
+              style={{ 
+                background: "linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)",
+                touchAction: "none",
+                filter: gameState === "paused" ? "brightness(0.7) blur(1px)" : "none"
+              }}
+            />
+            <GameHUD />
+            {gameState === "paused" && <PausedScreen />}
+            
+            {/* Game border glow effect */}
+            <div 
+              className="absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-300"
+              style={{
+                boxShadow: gameState === "playing" 
+                  ? "0 0 30px rgba(6, 182, 212, 0.3), inset 0 0 30px rgba(6, 182, 212, 0.1)" 
+                  : "none"
+              }}
+            ></div>
+          </div>
+        )}
+      </div>
+      
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+    </div>
+    
+    {/* Mobile-specific UI hints */}
+    {isMobile && gameState === "playing" && (
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full backdrop-blur-sm border border-slate-600/50">
+        Swipe to move • Tap to pause
+      </div>
+    )}
+  </div>
+);
+
+
+  // return (
+  //   <div className="w-full h-screen flex items-center justify-center bg-slate-900">
+  //     <div className="relative" style={{ width: canvasSize.width, height: canvasSize.height }}>
+  //       {gameState === "menu" && <MenuScreen />}
+  //       {gameState === "difficulty" && <DifficultyScreen />}
+  //       {gameState === "gameOver" && <GameOverScreen />}
+  //       {gameState === "victory" && <VictoryScreen />}
+        
+  //       {(gameState === "playing" || gameState === "paused") && (
+  //         <>
+  //           <canvas
+  //             ref={canvasRef}
+  //             width={canvasSize.width}
+  //             height={canvasSize.height}
+  //             className="border-2 border-cyan-500/50 rounded-lg shadow-2xl"
+  //             style={{ 
+  //               background: "linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)",
+  //               touchAction: "none" // Prevent scrolling on mobile
+  //             }}
+  //           />
+  //           <GameHUD />
+  //           {gameState === "paused" && <PausedScreen />}
+  //         </>
+  //       )}
+  //     </div>
+  //   </div>
+  // );
 };
 
 export default BrickBreakerGame;
