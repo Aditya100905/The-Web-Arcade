@@ -202,11 +202,8 @@ const BrickBreakerGame = () => {
 
           // More varied hit counts based on position and level
           let hitCount;
-          if (r < 2)
-            hitCount = Math.min(
-              1 + Math.floor(level / 4),
-              3
-            ); // Top rows harder
+          if (r < 2) hitCount = Math.min(1 + Math.floor(level / 4), 3);
+          // Top rows harder
           else if (r < 4) hitCount = Math.min(1 + Math.floor(level / 6), 2);
           else hitCount = 1;
 
@@ -803,7 +800,8 @@ const BrickBreakerGame = () => {
         window.removeEventListener("keydown", handleKeyDown);
         window.removeEventListener("keyup", handleKeyUp);
       }
-    };}, [isMobile]);
+    };
+  }, [isMobile]);
 
   // Touch controls for mobile
   useEffect(() => {
@@ -827,13 +825,19 @@ const BrickBreakerGame = () => {
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
       const touchX = touch.clientX - rect.left;
-      
+
       // Scale touch position to canvas coordinates
       const scaleX = CANVAS_WIDTH / rect.width;
       const scaledTouchX = touchX * scaleX;
 
       // Move paddle to touch position (centered)
-      game.paddle.x = Math.max(0, Math.min(CANVAS_WIDTH - game.paddle.width, scaledTouchX - game.paddle.width / 2));
+      game.paddle.x = Math.max(
+        0,
+        Math.min(
+          CANVAS_WIDTH - game.paddle.width,
+          scaledTouchX - game.paddle.width / 2
+        )
+      );
 
       // Start game on touch
       if (!game.gameStarted) {
@@ -844,9 +848,12 @@ const BrickBreakerGame = () => {
     const handleTouchEnd = (e) => {
       e.preventDefault();
       const touchEndTime = Date.now();
-      
+
       // Quick tap to pause/unpause
-      if (touchEndTime - game.lastTouchTime < 200 && Math.abs(e.changedTouches[0].clientX - game.touchStartX) < 10) {
+      if (
+        touchEndTime - game.lastTouchTime < 200 &&
+        Math.abs(e.changedTouches[0].clientX - game.touchStartX) < 10
+      ) {
         if (gameState === "playing") {
           setGameState("paused");
         } else if (gameState === "paused") {
@@ -876,8 +883,8 @@ const BrickBreakerGame = () => {
   };
 
   const nextLevel = () => {
-    setLevel(prev => prev + 1);
-    setScore(prev => prev + 500); // Level completion bonus
+    setLevel((prev) => prev + 1);
+    setScore((prev) => prev + 500); // Level completion bonus
     setGameState("playing");
   };
 
@@ -912,353 +919,404 @@ const BrickBreakerGame = () => {
     setHighScore(savedHighScores[difficulty]);
   }, [difficulty, savedHighScores]);
 
-const MenuScreen = () => (
-  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
-    <div className="text-center w-full max-w-md">
-      <h1 className="text-4xl sm:text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-        BRICK
-      </h1>
-      <h1 className="text-4xl sm:text-5xl font-bold mb-8 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-        BREAKER
-      </h1>
+  const MenuScreen = () => (
+    <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
+      <div className="text-center w-full max-w-md">
+        <h1 className="text-4xl sm:text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          BRICK
+        </h1>
+        <h1 className="text-4xl sm:text-5xl font-bold mb-8 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+          BREAKER
+        </h1>
 
-      <div className="mb-10 p-4 bg-black/20 rounded-lg backdrop-blur-sm">
-        <p className="text-base sm:text-lg mb-2">High Score ({difficulty})</p>
-        <p className="text-2xl sm:text-3xl font-bold text-cyan-400">{highScore.toLocaleString()}</p>
-      </div>
-
-      <div className="space-y-4">
-        <button
-          onClick={startGame}
-          className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105"
-        >
-          START GAME
-        </button>
-
-        <button
-          onClick={() => setGameState("difficulty")}
-          className="w-full py-3 px-6 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 rounded-lg font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105"
-        >
-          DIFFICULTY: {difficulty.toUpperCase()}
-        </button>
-
-        <div className="text-xs sm:text-sm text-gray-300 mt-6 space-y-1">
-          <p>{isMobile ? "Touch to move paddle" : "Arrow keys to move paddle"}</p>
-          <p>{isMobile ? "Quick tap to pause" : "Spacebar to pause"}</p>
-          <p>Break all bricks to advance!</p>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-
-const DifficultyScreen = () => (
-  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
-    <div className="text-center w-full max-w-md">
-      <h2 className="text-3xl sm:text-4xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
-        SELECT DIFFICULTY
-      </h2>
-
-      <div className="space-y-4 mb-10">
-        {["easy", "medium", "hard"].map((diff) => {
-          const config = getDifficultyConfig(diff);
-          const isSelected = difficulty === diff;
-
-          return (
-            <div
-              key={diff}
-              onClick={() => selectDifficulty(diff)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && selectDifficulty(diff)}
-              aria-pressed={isSelected}
-              className={`p-4 rounded-lg cursor-pointer transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                isSelected
-                  ? "bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg"
-                  : "bg-black/20 hover:bg-black/30"
-              } backdrop-blur-sm`}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg sm:text-xl font-bold capitalize">{diff}</h3>
-                <span className="text-base sm:text-lg font-mono text-cyan-400">
-                  {savedHighScores[diff].toLocaleString()}
-                </span>
-              </div>
-              <div className="text-sm text-gray-300">
-                <p>
-                  Lives: {config.lives} | Speed: {config.ballSpeed} | Paddle: {config.paddleWidth}px
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <button
-        onClick={() => setGameState("menu")}
-        className="w-full py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200"
-      >
-        BACK
-      </button>
-    </div>
-  </div>
-);
-
-const GameOverScreen = () => (
-  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
-    <div className="text-center w-full max-w-md">
-      <h2 className="text-4xl sm:text-5xl font-bold mb-6 text-red-400">GAME OVER</h2>
-      
-      <div className="mb-10 space-y-4">
-        <div className="p-4 bg-black/20 rounded-lg backdrop-blur-sm">
-          <p className="text-base sm:text-lg mb-1">Final Score</p>
-          <p className="text-2xl sm:text-3xl font-bold text-cyan-400">{score.toLocaleString()}</p>
-        </div>
-        
-        <div className="p-4 bg-black/20 rounded-lg backdrop-blur-sm">
-          <p className="text-base sm:text-lg mb-1">Level Reached</p>
-          <p className="text-xl sm:text-2xl font-bold text-purple-400">{level}</p>
+        <div className="mb-10 p-4 bg-black/20 rounded-lg backdrop-blur-sm">
+          <p className="text-base sm:text-lg mb-2">High Score ({difficulty})</p>
+          <p className="text-2xl sm:text-3xl font-bold text-cyan-400">
+            {highScore.toLocaleString()}
+          </p>
         </div>
 
-        {score === savedHighScores[difficulty] && (
-          <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
-            <p className="font-bold">🏆 NEW HIGH SCORE! 🏆</p>
+        <div className="space-y-4">
+          <button
+            onClick={startGame}
+            className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105"
+          >
+            START GAME
+          </button>
+
+          <button
+            onClick={() => setGameState("difficulty")}
+            className="w-full py-3 px-6 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 rounded-lg font-semibold text-base sm:text-lg transition-all duration-200 transform hover:scale-105"
+          >
+            DIFFICULTY: {difficulty.toUpperCase()}
+          </button>
+
+          <div className="text-xs sm:text-sm text-gray-300 mt-6 space-y-1">
+            <p>
+              {isMobile ? "Touch to move paddle" : "Arrow keys to move paddle"}
+            </p>
+            <p>{isMobile ? "Quick tap to pause" : "Spacebar to pause"}</p>
+            <p>Break all bricks to advance!</p>
           </div>
-        )}
+        </div>
       </div>
+    </div>
+  );
 
-      <div className="space-y-3">
+  const DifficultyScreen = () => (
+    <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
+      <div className="text-center w-full max-w-md">
+        <h2 className="text-3xl sm:text-4xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+          SELECT DIFFICULTY
+        </h2>
+
+        <div className="space-y-4 mb-10">
+          {["easy", "medium", "hard"].map((diff) => {
+            const config = getDifficultyConfig(diff);
+            const isSelected = difficulty === diff;
+
+            return (
+              <div
+                key={diff}
+                onClick={() => selectDifficulty(diff)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && selectDifficulty(diff)}
+                aria-pressed={isSelected}
+                className={`p-4 rounded-lg cursor-pointer transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                  isSelected
+                    ? "bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg"
+                    : "bg-black/20 hover:bg-black/30"
+                } backdrop-blur-sm`}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg sm:text-xl font-bold capitalize">
+                    {diff}
+                  </h3>
+                  <span className="text-base sm:text-lg font-mono text-cyan-400">
+                    {savedHighScores[diff].toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-300">
+                  <p>
+                    Lives: {config.lives} | Speed: {config.ballSpeed} | Paddle:{" "}
+                    {config.paddleWidth}px
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         <button
-          onClick={restartGame}
-          className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105"
-        >
-          PLAY AGAIN
-        </button>
-        
-        <button
-          onClick={backToMenu}
+          onClick={() => setGameState("menu")}
           className="w-full py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200"
         >
-          MAIN MENU
+          BACK
         </button>
       </div>
     </div>
-  </div>
-);
+  );
 
-const VictoryScreen = () => (
-  <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 text-white p-4 sm:p-8">
-    <div className="text-center w-full max-w-xs sm:max-w-md">
-      <h2 className={`${isMobile ? 'text-3xl' : 'text-5xl'} font-bold mb-4 text-green-400`}>
-        LEVEL COMPLETE!
-      </h2>
-      
-      <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
-        <div className={`${isMobile ? 'p-3' : 'p-4'} bg-black/20 rounded-lg backdrop-blur-sm`}>
-          <p className={`${isMobile ? 'text-base' : 'text-lg'} mb-1`}>Score</p>
-          <p className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-cyan-400`}>
-            {score.toLocaleString()}
-          </p>
-        </div>
-        
-        <div className={`${isMobile ? 'p-3' : 'p-4'} bg-black/20 rounded-lg backdrop-blur-sm`}>
-          <p className={`${isMobile ? 'text-base' : 'text-lg'} mb-1`}>Level Completed</p>
-          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-purple-400`}>
-            {level}
-          </p>
-        </div>
-        
-        <div className={`${isMobile ? 'p-2' : 'p-3'} bg-gradient-to-r from-green-500 to-teal-500 rounded-lg`}>
-          <p className={`font-bold ${isMobile ? 'text-sm' : 'text-base'}`}>
-            +500 Bonus Points!
-          </p>
-        </div>
-      </div>
+  const GameOverScreen = () => (
+    <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 text-white px-4 py-8 sm:px-6 md:px-8">
+      <div className="text-center w-full max-w-md">
+        <h2 className="text-4xl sm:text-5xl font-bold mb-6 text-red-400">
+          GAME OVER
+        </h2>
 
-      <div className="space-y-3">
-        <button
-          onClick={nextLevel}
-          className={`w-full ${isMobile ? 'py-2 px-4 text-sm' : 'py-3 px-6'} bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105`}
-        >
-          NEXT LEVEL
-        </button>
-        
-        <button
-          onClick={backToMenu}
-          className={`w-full ${isMobile ? 'py-2 px-4 text-sm' : 'py-2 px-6'} bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200`}
-        >
-          MAIN MENU
-        </button>
+        <div className="mb-10 space-y-4">
+          <div className="p-4 bg-black/20 rounded-lg backdrop-blur-sm">
+            <p className="text-base sm:text-lg mb-1">Final Score</p>
+            <p className="text-2xl sm:text-3xl font-bold text-cyan-400">
+              {score.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="p-4 bg-black/20 rounded-lg backdrop-blur-sm">
+            <p className="text-base sm:text-lg mb-1">Level Reached</p>
+            <p className="text-xl sm:text-2xl font-bold text-purple-400">
+              {level}
+            </p>
+          </div>
+
+          {score === savedHighScores[difficulty] && (
+            <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
+              <p className="font-bold">🏆 NEW HIGH SCORE! 🏆</p>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          <button
+            onClick={restartGame}
+            className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105"
+          >
+            PLAY AGAIN
+          </button>
+
+          <button
+            onClick={backToMenu}
+            className="w-full py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200"
+          >
+            MAIN MENU
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 
-const PausedScreen = () => (
-  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10">
-    <div className="text-center text-white w-full max-w-sm px-4">
-      <h2 className="text-3xl sm:text-4xl font-bold mb-8">PAUSED</h2>
-
-      <div className="space-y-4">
-        <button
-          onClick={() => setGameState("playing")}
-          className="w-full max-w-xs mx-auto block py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold text-base transition-all duration-200 transform hover:scale-105"
+  const VictoryScreen = () => (
+    <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 text-white p-4 sm:p-8">
+      <div className="text-center w-full max-w-xs sm:max-w-md">
+        <h2
+          className={`${
+            isMobile ? "text-3xl" : "text-5xl"
+          } font-bold mb-4 text-green-400`}
         >
-          RESUME
-        </button>
+          LEVEL COMPLETE!
+        </h2>
 
-        <button
-          onClick={backToMenu}
-          className="w-full max-w-xs mx-auto block py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold text-base transition-all duration-200"
-        >
-          MAIN MENU
-        </button>
+        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
+          <div
+            className={`${
+              isMobile ? "p-3" : "p-4"
+            } bg-black/20 rounded-lg backdrop-blur-sm`}
+          >
+            <p className={`${isMobile ? "text-base" : "text-lg"} mb-1`}>
+              Score
+            </p>
+            <p
+              className={`${
+                isMobile ? "text-2xl" : "text-3xl"
+              } font-bold text-cyan-400`}
+            >
+              {score.toLocaleString()}
+            </p>
+          </div>
+
+          <div
+            className={`${
+              isMobile ? "p-3" : "p-4"
+            } bg-black/20 rounded-lg backdrop-blur-sm`}
+          >
+            <p className={`${isMobile ? "text-base" : "text-lg"} mb-1`}>
+              Level Completed
+            </p>
+            <p
+              className={`${
+                isMobile ? "text-xl" : "text-2xl"
+              } font-bold text-purple-400`}
+            >
+              {level}
+            </p>
+          </div>
+
+          <div
+            className={`${
+              isMobile ? "p-2" : "p-3"
+            } bg-gradient-to-r from-green-500 to-teal-500 rounded-lg`}
+          >
+            <p className={`font-bold ${isMobile ? "text-sm" : "text-base"}`}>
+              +500 Bonus Points!
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <button
+            onClick={nextLevel}
+            className={`w-full ${
+              isMobile ? "py-2 px-4 text-sm" : "py-3 px-6"
+            } bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105`}
+          >
+            NEXT LEVEL
+          </button>
+
+          <button
+            onClick={backToMenu}
+            className={`w-full ${
+              isMobile ? "py-2 px-4 text-sm" : "py-2 px-6"
+            } bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition-all duration-200`}
+          >
+            MAIN MENU
+          </button>
+        </div>
       </div>
-
-      <p className="text-sm text-gray-300 mt-6">
-        {isMobile ? "Tap to resume" : "Press SPACE to resume"}
-      </p>
     </div>
-  </div>
-);
+  );
 
+  const PausedScreen = () => (
+    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10">
+      <div className="text-center text-white w-full max-w-sm px-4">
+        <h2 className="text-3xl sm:text-4xl font-bold mb-8">PAUSED</h2>
+
+        <div className="space-y-4">
+          <button
+            onClick={() => setGameState("playing")}
+            className="w-full max-w-xs mx-auto block py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold text-base transition-all duration-200 transform hover:scale-105"
+          >
+            RESUME
+          </button>
+
+          <button
+            onClick={backToMenu}
+            className="w-full max-w-xs mx-auto block py-2 px-6 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold text-base transition-all duration-200"
+          >
+            MAIN MENU
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-300 mt-6">
+          {isMobile ? "Tap to resume" : "Press SPACE to resume"}
+        </p>
+      </div>
+    </div>
+  );
 
   const GameHUD = () => (
-  <div className={`absolute top-2 left-2 right-2 flex justify-between text-white z-10 ${
-    isMobile ? 'text-xs' : 'text-sm'
-  }`}>
-    <div className={`flex ${isMobile ? 'flex-col space-y-1' : 'space-x-6'}`}>
-      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
-        <span className="text-xs">Score: </span>
-        <span className="font-bold text-cyan-400">{score.toLocaleString()}</span>
-      </div>
-      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
-        <span className="text-xs">Level: </span>
-        <span className="font-bold text-purple-400">{level}</span>
-      </div>
-    </div>
-    
-    <div className={`flex ${isMobile ? 'flex-col space-y-1 items-end' : 'space-x-6'}`}>
-      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
-        <span className="text-xs">Lives: </span>
-        <span className="font-bold text-red-400">{"❤️".repeat(lives)}</span>
-      </div>
-      <div className={`bg-black/30 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'} rounded backdrop-blur-sm`}>
-        <span className="text-xs">High: </span>
-        <span className="font-bold text-yellow-400">{highScore.toLocaleString()}</span>
-      </div>
-    </div>
-  </div>
-);
-
-return (
-  <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-2 sm:p-4">
-    <div 
-      className="relative bg-slate-800/30 backdrop-blur-sm rounded-xl shadow-2xl border border-slate-700/50 overflow-hidden"
-      style={{ 
-        width: Math.min(canvasSize.width + (isMobile ? 8 : 16), window.innerWidth - (isMobile ? 16 : 32)), 
-        height: Math.min(canvasSize.height + (isMobile ? 8 : 16), window.innerHeight - (isMobile ? 16 : 32)),
-        maxWidth: isMobile ? '100vw' : 'calc(100vw - 2rem)',
-        maxHeight: isMobile ? '100vh' : 'calc(100vh - 2rem)'
-      }}
+    <div
+      className={`absolute top-2 left-2 right-2 flex justify-between text-white z-10 ${
+        isMobile ? "text-xs" : "text-sm"
+      }`}
     >
-      {/* Decorative corner elements */}
-      <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-cyan-500/30 rounded-tl-lg"></div>
-      <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-cyan-500/30 rounded-tr-lg"></div>
-      <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-cyan-500/30 rounded-bl-lg"></div>
-      <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-cyan-500/30 rounded-br-lg"></div>
-      
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-cyan-400/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-blue-400/20 rounded-full animate-pulse delay-500"></div>
-        <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-purple-400/20 rounded-full animate-pulse delay-1000"></div>
+      <div className={`flex ${isMobile ? "flex-col space-y-1" : "space-x-6"}`}>
+        <div
+          className={`bg-black/30 ${
+            isMobile ? "px-2 py-0.5" : "px-3 py-1"
+          } rounded backdrop-blur-sm`}
+        >
+          <span className="text-xs">Score: </span>
+          <span className="font-bold text-cyan-400">
+            {score.toLocaleString()}
+          </span>
+        </div>
+        <div
+          className={`bg-black/30 ${
+            isMobile ? "px-2 py-0.5" : "px-3 py-1"
+          } rounded backdrop-blur-sm`}
+        >
+          <span className="text-xs">Level: </span>
+          <span className="font-bold text-purple-400">{level}</span>
+        </div>
       </div>
 
-      {/* Content container */}
-      <div 
-        className="w-full h-full flex items-center justify-center p-2"
-        style={{ 
-          minWidth: canvasSize.width,
-          minHeight: canvasSize.height 
+      <div
+        className={`flex ${
+          isMobile ? "flex-col space-y-1 items-end" : "space-x-6"
+        }`}
+      >
+        <div
+          className={`bg-black/30 ${
+            isMobile ? "px-2 py-0.5" : "px-3 py-1"
+          } rounded backdrop-blur-sm`}
+        >
+          <span className="text-xs">Lives: </span>
+          <span className="font-bold text-red-400">{"❤️".repeat(lives)}</span>
+        </div>
+        <div
+          className={`bg-black/30 ${
+            isMobile ? "px-2 py-0.5" : "px-3 py-1"
+          } rounded backdrop-blur-sm`}
+        >
+          <span className="text-xs">High: </span>
+          <span className="font-bold text-yellow-400">
+            {highScore.toLocaleString()}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-2 sm:p-4">
+      <div
+        className="relative bg-slate-800/30 backdrop-blur-sm rounded-xl shadow-2xl border border-slate-700/50 overflow-hidden"
+        style={{
+          width: Math.min(
+            canvasSize.width + (isMobile ? 8 : 16),
+            window.innerWidth - (isMobile ? 16 : 32)
+          ),
+          height: Math.min(
+            canvasSize.height + (isMobile ? 8 : 16),
+            window.innerHeight - (isMobile ? 16 : 32)
+          ),
+          maxWidth: isMobile ? "100vw" : "calc(100vw - 2rem)",
+          maxHeight: isMobile ? "100vh" : "calc(100vh - 2rem)",
         }}
       >
-        {gameState === "menu" && <MenuScreen />}
-        {gameState === "difficulty" && <DifficultyScreen />}
-        {gameState === "gameOver" && <GameOverScreen />}
-        {gameState === "victory" && <VictoryScreen />}
-        
-        {(gameState === "playing" || gameState === "paused") && (
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              width={canvasSize.width}
-              height={canvasSize.height}
-              className="border border-cyan-500/30 rounded-lg shadow-xl transition-all duration-300 hover:border-cyan-500/50"
-              style={{ 
-                background: "linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)",
-                touchAction: "none",
-                filter: gameState === "paused" ? "brightness(0.7) blur(1px)" : "none"
-              }}
-            />
-            <GameHUD />
-            {gameState === "paused" && <PausedScreen />}
-            
-            {/* Game border glow effect */}
-            <div 
-              className="absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-300"
-              style={{
-                boxShadow: gameState === "playing" 
-                  ? "0 0 30px rgba(6, 182, 212, 0.3), inset 0 0 30px rgba(6, 182, 212, 0.1)" 
-                  : "none"
-              }}
-            ></div>
-          </div>
-        )}
+        {/* Decorative corner elements */}
+        <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-cyan-500/30 rounded-tl-lg"></div>
+        <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-cyan-500/30 rounded-tr-lg"></div>
+        <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-cyan-500/30 rounded-bl-lg"></div>
+        <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-cyan-500/30 rounded-br-lg"></div>
+
+        {/* Animated background particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-cyan-400/20 rounded-full animate-pulse"></div>
+          <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-blue-400/20 rounded-full animate-pulse delay-500"></div>
+          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-purple-400/20 rounded-full animate-pulse delay-1000"></div>
+        </div>
+
+        {/* Content container */}
+        <div
+          className="w-full h-full flex items-center justify-center p-2"
+          style={{
+            minWidth: canvasSize.width,
+            minHeight: canvasSize.height,
+          }}
+        >
+          {gameState === "menu" && <MenuScreen />}
+          {gameState === "difficulty" && <DifficultyScreen />}
+          {gameState === "gameOver" && <GameOverScreen />}
+          {gameState === "victory" && <VictoryScreen />}
+
+          {(gameState === "playing" || gameState === "paused") && (
+            <div className="relative">
+              <canvas
+                ref={canvasRef}
+                width={canvasSize.width}
+                height={canvasSize.height}
+                className="border border-cyan-500/30 rounded-lg shadow-xl transition-all duration-300 hover:border-cyan-500/50"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)",
+                  touchAction: "none",
+                  filter:
+                    gameState === "paused"
+                      ? "brightness(0.7) blur(1px)"
+                      : "none",
+                }}
+              />
+              <GameHUD />
+              {gameState === "paused" && <PausedScreen />}
+
+              {/* Game border glow effect */}
+              <div
+                className="absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-300"
+                style={{
+                  boxShadow:
+                    gameState === "playing"
+                      ? "0 0 30px rgba(6, 182, 212, 0.3), inset 0 0 30px rgba(6, 182, 212, 0.1)"
+                      : "none",
+                }}
+              ></div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom accent line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
       </div>
-      
-      {/* Bottom accent line */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+
+      {/* Mobile-specific UI hints */}
+      {isMobile && gameState === "playing" && (
+        <div className="absolute bottom-0 text-center w-full left-1/2 transform -translate-x-1/2 text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full backdrop-blur-sm border border-slate-600/50">
+          Swipe to move • Tap to pause
+        </div>
+      )}
     </div>
-    
-    {/* Mobile-specific UI hints */}
-    {isMobile && gameState === "playing" && (
-      <div className="absolute bottom-0 text-center w-full left-1/2 transform -translate-x-1/2 text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full backdrop-blur-sm border border-slate-600/50">
-        Swipe to move • Tap to pause
-      </div>
-    )}
-  </div>
-);
-
-
-  // return (
-  //   <div className="w-full h-screen flex items-center justify-center bg-slate-900">
-  //     <div className="relative" style={{ width: canvasSize.width, height: canvasSize.height }}>
-  //       {gameState === "menu" && <MenuScreen />}
-  //       {gameState === "difficulty" && <DifficultyScreen />}
-  //       {gameState === "gameOver" && <GameOverScreen />}
-  //       {gameState === "victory" && <VictoryScreen />}
-        
-  //       {(gameState === "playing" || gameState === "paused") && (
-  //         <>
-  //           <canvas
-  //             ref={canvasRef}
-  //             width={canvasSize.width}
-  //             height={canvasSize.height}
-  //             className="border-2 border-cyan-500/50 rounded-lg shadow-2xl"
-  //             style={{ 
-  //               background: "linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)",
-  //               touchAction: "none" // Prevent scrolling on mobile
-  //             }}
-  //           />
-  //           <GameHUD />
-  //           {gameState === "paused" && <PausedScreen />}
-  //         </>
-  //       )}
-  //     </div>
-  //   </div>
-  // );
+  );
 };
 
 export default BrickBreakerGame;
