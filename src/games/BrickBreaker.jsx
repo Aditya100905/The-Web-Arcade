@@ -1224,7 +1224,7 @@ return (
     
     {/* Mobile-specific UI hints */}
     {isMobile && gameState === "playing" && (
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full backdrop-blur-sm border border-slate-600/50">
+      <div className="absolute bottom-0 text-center w-full left-1/2 transform -translate-x-1/2 text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full backdrop-blur-sm border border-slate-600/50">
         Swipe to move • Tap to pause
       </div>
     )}
