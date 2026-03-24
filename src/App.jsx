@@ -14,6 +14,7 @@ import BrickBreaker from "./games/BrickBreaker";
 import DotsAndBoxes from "./games/DotsAndBoxesGame";
 import FlappyBrid from "./games/FlappyBird";
 import NotFound from "./pages/NotFound";
+import CyberDash from "./games/CyberDash";
 
 const App = () => {
   const location = useLocation();
@@ -29,7 +30,8 @@ const App = () => {
     "/tic-tac-toe",
     "/brick-breaker",
     "/dots-boxes",
-    "/flappy-bird"
+    "/flappy-bird",
+    "/cyber-dash"
   ];
   
   // Check if current route should show navbar
@@ -49,6 +51,7 @@ const App = () => {
         <Route path="/brick-breaker" element={<BrickBreaker />} />
         <Route path="/dots-boxes" element={<DotsAndBoxes />} />
         <Route path="/flappy-bird" element={<FlappyBrid />} />
+        <Route path="/cyber-dash" element={<CyberDash />} />
 
         {/* Catch-all route for unmatched paths */}
         <Route path="*" element={<NotFound />} />

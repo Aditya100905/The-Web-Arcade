@@ -49,6 +49,19 @@ const games = [
   },
   {
     id: 2,
+    name: "Cyber Dash",
+    category: "Arcade",
+    difficulty: "Medium",
+    color: "from-cyan-500 via-blue-600 to-purple-700",
+    icon: <Zap className="w-20 h-20" />,
+    description: "High-speed infinite runner with obstacles and moves",
+    route: "/cyber-dash",
+    players: "Single",
+    estimatedTime: "5-15 min",
+    gif: "/gif/cyber-dash.gif",
+  },
+  {
+    id: 3,
     name: "Rock Paper Scissors",
     category: "Classic",
     difficulty: "Easy",
@@ -61,7 +74,7 @@ const games = [
     gif: "/gif/rock-paper-scissors.gif",
   },
   {
-    id: 3,
+    id: 4,
     name: "Sudoku",
     category: "Logic",
     difficulty: "Hard",
@@ -74,7 +87,7 @@ const games = [
     gif: "/gif/sudoku.gif",
   },
   {
-    id: 4,
+    id: 5,
     name: "",
     category: "Memory",
     difficulty: "Easy",
@@ -87,7 +100,7 @@ const games = [
     gif: "/gif/memory-matching.gif",
   },
   {
-    id: 5,
+    id: 6,
     name: "Tic Tac Toe",
     category: "Strategy",
     difficulty: "Easy",
@@ -100,7 +113,7 @@ const games = [
     gif: "/gif/tic-tac-toe.gif",
   },
   {
-    id: 6,
+    id: 7,
     name: "Flappy Bird",
     category: "Arcade",
     difficulty: "Hard",
@@ -113,7 +126,7 @@ const games = [
     gif: "/gif/flappy-bird.gif",
   },
   {
-    id: 7,
+    id: 8,
     name: "Brick Breaker",
     category: "Arcade",
     difficulty: "Medium",
@@ -126,7 +139,7 @@ const games = [
     gif: "/gif/brick-breaker.gif",
   },
   {
-    id: 8,
+    id: 9,
     name: "Dots & Boxes",
     category: "Strategy",
     difficulty: "Medium",
@@ -294,11 +307,10 @@ export default function Home() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  selectedCategory === category
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === category
                     ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/25"
                     : "bg-white/10 text-gray-300 hover:bg-white/20 border border-white/10 hover:border-white/30"
-                }`}
+                  }`}
               >
                 {category}
               </button>
@@ -338,11 +350,9 @@ export default function Home() {
                 {/* Game Icon/GIF Section */}
                 <div className="relative h-36 sm:h-40 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden">
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${
-                      game.color
-                    } opacity-20 transition-opacity duration-500 ${
-                      hoveredGame === game.id ? "opacity-30" : "opacity-20"
-                    }`}
+                    className={`absolute inset-0 bg-gradient-to-br ${game.color
+                      } opacity-20 transition-opacity duration-500 ${hoveredGame === game.id ? "opacity-30" : "opacity-20"
+                      }`}
                   ></div>
 
                   {/* Game Icon or GIF */}
@@ -360,11 +370,10 @@ export default function Home() {
 
                   {/* GIF Hover State */}
                   <div
-                    className={`absolute inset-0 z-20 transition-all duration-500 transform ${
-                      hoveredGame === game.id
+                    className={`absolute inset-0 z-20 transition-all duration-500 transform ${hoveredGame === game.id
                         ? "scale-100 opacity-100"
                         : "scale-95 opacity-0 pointer-events-none"
-                    }`}
+                      }`}
                   >
                     <div className="relative w-full h-full flex items-center justify-center bg-black/30 backdrop-blur-sm">
                       {loadedGifs[game.id] ? (
@@ -464,8 +473,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center hover:scale-110 transition-transform justify-center gap-3 mb-4">
-              
-              
+
+
 
               <div className="relative">
                 <img
