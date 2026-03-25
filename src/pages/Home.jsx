@@ -151,6 +151,19 @@ const games = [
     estimatedTime: "10-15 min",
     gif: "/gif/dots-and-boxes.gif",
   },
+  {
+    id: 10,
+    name: "Hangman",
+    category: "Classic",
+    difficulty: "Easy",
+    color: "from-rose-500 via-red-500 to-pink-600",
+    icon: <Puzzle className="w-20 h-20" />,
+    description: "Guess the word before the hangman is complete",
+    route: "/hangman",
+    players: "Single",
+    estimatedTime: "5-10 min",
+    gif: "/gif/hangman.gif",
+  }
 ];
 
 export default function Home() {
@@ -308,8 +321,8 @@ export default function Home() {
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === category
-                    ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/25"
-                    : "bg-white/10 text-gray-300 hover:bg-white/20 border border-white/10 hover:border-white/30"
+                  ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/25"
+                  : "bg-white/10 text-gray-300 hover:bg-white/20 border border-white/10 hover:border-white/30"
                   }`}
               >
                 {category}
@@ -371,8 +384,8 @@ export default function Home() {
                   {/* GIF Hover State */}
                   <div
                     className={`absolute inset-0 z-20 transition-all duration-500 transform ${hoveredGame === game.id
-                        ? "scale-100 opacity-100"
-                        : "scale-95 opacity-0 pointer-events-none"
+                      ? "scale-100 opacity-100"
+                      : "scale-95 opacity-0 pointer-events-none"
                       }`}
                   >
                     <div className="relative w-full h-full flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -493,7 +506,7 @@ export default function Home() {
             <p className="text-gray-400 text-sm">
               Built with{" "}
               <span className="animate-pulse text-xl scale-110">❤️</span> for
-              gaming enthusiasts
+              gaming enthusiasts by tech enthusiast
             </p>
           </div>
         </div>
